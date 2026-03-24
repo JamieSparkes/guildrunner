@@ -1,0 +1,82 @@
+[
+  {
+    "faction_id": "crown",
+    "display_name": "The Crown",
+    "faction_type": "CROWN",
+    "threshold_enemy": -50,
+    "threshold_unknown": -20,
+    "threshold_neutral": 10,
+    "threshold_trusted": 55,
+    "siege_aid_at_tier": "TRUSTED",
+    "siege_force_strength": 10,
+    "contract_pool": [
+      "bandit_purge", "noble_escort", "crown_defense"
+    ],
+    "description": "The ruling nobility and their military apparatus. They offer legitimate, well-paying work — and do not forgive slights.",
+    "hostile_action_description": "Knights or royal soldiers are dispatched to make an example of the guild."
+  },
+  {
+    "faction_id": "church",
+    "display_name": "The Church",
+    "faction_type": "CHURCH",
+    "threshold_enemy": -45,
+    "threshold_unknown": -15,
+    "threshold_neutral": 10,
+    "threshold_trusted": 50,
+    "siege_aid_at_tier": "TRUSTED",
+    "siege_force_strength": 7,
+    "contract_pool": [
+      "graveyard_investigation", "undead_hunt", "relic_recovery"
+    ],
+    "description": "A powerful religious institution with political reach. They deal in monsters, cults, and lost relics. Angering them closes doors.",
+    "hostile_action_description": "Inquisitors investigate the guild and deny access to Church-affiliated healers and supplies."
+  },
+  {
+    "faction_id": "merchants",
+    "display_name": "Merchants' League",
+    "faction_type": "MERCHANTS",
+    "threshold_enemy": -40,
+    "threshold_unknown": -10,
+    "threshold_neutral": 15,
+    "threshold_trusted": 55,
+    "siege_aid_at_tier": "HONOURED",
+    "siege_force_strength": 5,
+    "contract_pool": [
+      "cargo_recovery", "merchant_guard", "warehouse_defense"
+    ],
+    "description": "A coalition of traders and financiers. They pay well and complain loudly. Reliable clients — unless crossed.",
+    "hostile_action_description": "Assassins are hired through underworld contacts; future contracts mysteriously dry up."
+  },
+  {
+    "faction_id": "underworld",
+    "display_name": "The Underworld",
+    "faction_type": "UNDERWORLD",
+    "threshold_enemy": -55,
+    "threshold_unknown": -20,
+    "threshold_neutral": 5,
+    "threshold_trusted": 50,
+    "siege_aid_at_tier": "HONOURED",
+    "siege_force_strength": 8,
+    "contract_pool": [
+      "quiet_elimination", "theft_contract", "ruin_mapping"
+    ],
+    "description": "Criminals, thieves, and worse. Their work is off the books and pays in coin that asks no questions.",
+    "hostile_action_description": "Sabotage events begin; night raids on the guild by armed brigands."
+  },
+  {
+    "faction_id": "common_folk",
+    "display_name": "Common Folk",
+    "faction_type": "COMMON_FOLK",
+    "threshold_enemy": -60,
+    "threshold_unknown": -15,
+    "threshold_neutral": 10,
+    "threshold_trusted": 50,
+    "siege_aid_at_tier": "HONOURED",
+    "siege_force_strength": 3,
+    "contract_pool": [
+      "wolf_pack", "missing_cart", "village_defense"
+    ],
+    "description": "Farmers, labourers, and townsfolk. They can't pay much, but there are many of them, and reputation spreads fast among the common people.",
+    "hostile_action_description": "Reputation damage only. No organised force, but local cooperation dries up."
+  }
+]

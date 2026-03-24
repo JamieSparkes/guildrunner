@@ -1,0 +1,42 @@
+[
+  {
+    "type": "STOIC",
+    "blurb": "Speaks little, endures much. Relies on discipline over feeling.",
+    "dialogue_pool_id": "stoic"
+  },
+  {
+    "type": "RECKLESS",
+    "blurb": "Charges first, considers second. Risk isn't something to manage — it's something to court.",
+    "dialogue_pool_id": "reckless"
+  },
+  {
+    "type": "LOYAL",
+    "blurb": "Puts the squad first, always. Will not leave someone behind.",
+    "dialogue_pool_id": "loyal"
+  },
+  {
+    "type": "CYNICAL",
+    "blurb": "Has seen too much to be surprised. Takes the work, doubts the cause.",
+    "dialogue_pool_id": "cynical"
+  },
+  {
+    "type": "CHEERFUL",
+    "blurb": "Finds something to like in almost any situation. Others find it either infectious or annoying.",
+    "dialogue_pool_id": "cheerful"
+  },
+  {
+    "type": "GRIM",
+    "blurb": "Quiet, focused, and humourless. The job is the job.",
+    "dialogue_pool_id": "grim"
+  },
+  {
+    "type": "CAUTIOUS",
+    "blurb": "Measures twice, cuts once. Hesitation has kept this one alive when others haven't.",
+    "dialogue_pool_id": "cautious"
+  },
+  {
+    "type": "PROUD",
+    "blurb": "Reputation matters. Does not accept failure quietly.",
+    "dialogue_pool_id": "proud"
+  }
+]

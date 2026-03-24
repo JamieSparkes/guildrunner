@@ -1,0 +1,49 @@
+extends Node
+## Global event bus for cross-system communication.
+## All managers emit and connect signals here. No direct manager-to-manager references.
+
+# ── Time ─────────────────────────────────────────────────────────────────────
+
+signal day_advanced(day: int)
+signal night_began(day: int)
+signal week_advanced(week: int)
+
+# ── Heroes ────────────────────────────────────────────────────────────────────
+
+signal hero_dispatched(hero_id: String, mission_id: String)
+signal hero_returned(hero_id: String, result: int)          # Enums.MissionResult
+signal hero_wounded(hero_id: String, severity: int)         # Enums.InjurySeverity
+signal hero_killed(hero_id: String, mission_id: String)
+signal hero_captured(hero_id: String, mission_id: String)
+signal hero_trait_acquired(hero_id: String, trait_id: String)
+signal hero_morale_changed(hero_id: String, delta: float)
+
+# ── Contracts ─────────────────────────────────────────────────────────────────
+
+signal contract_available(contract_id: String)
+signal contract_accepted(contract_id: String)
+signal contract_completed(contract_id: String, success: bool)
+signal contract_expired(contract_id: String, was_consequential: bool)
+signal messenger_arrived(contract_id: String)
+
+# ── Feed ──────────────────────────────────────────────────────────────────────
+
+signal feed_event(mission_id: String, event_key: String, params: Dictionary)
+signal feed_intervention_available(mission_id: String)
+signal intervention_used(mission_id: String, new_commitment: int)  # Enums.CommitmentLevel
+
+# ── Factions ─────────────────────────────────────────────────────────────────
+
+signal reputation_changed(faction_id: String, delta: int, new_tier: int)  # Enums.RepTier
+signal faction_became_enemy(faction_id: String)
+signal faction_became_ally(faction_id: String)
+
+# ── Guild ─────────────────────────────────────────────────────────────────────
+
+signal upgrade_built(building_id: String, tier: int)
+signal guild_attacked(source: String, strength: int)
+signal gold_changed(delta: int, new_total: int)
+
+# ── Game state ────────────────────────────────────────────────────────────────
+
+signal state_changed(from_state: int, to_state: int)  # Enums.GameState

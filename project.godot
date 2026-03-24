@@ -1,0 +1,46 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Guildrunner"
+config/description="A single-player guild management game."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+EventBus="*res://autoloads/EventBus.gd"
+GameManager="*res://autoloads/GameManager.gd"
+TimeManager="*res://autoloads/TimeManager.gd"
+GuildManager="*res://autoloads/GuildManager.gd"
+HeroManager="*res://autoloads/HeroManager.gd"
+MissionManager="*res://autoloads/MissionManager.gd"
+ItemManager="*res://autoloads/ItemManager.gd"
+FactionManager="*res://autoloads/FactionManager.gd"
+BuildingManager="*res://autoloads/BuildingManager.gd"
+FeedManager="*res://autoloads/FeedManager.gd"
+ContractQueue="*res://autoloads/ContractQueue.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

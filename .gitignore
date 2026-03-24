@@ -1,0 +1,32 @@
+# Godot 4 gitignore
+
+# Godot-specific ignores
+.godot/
+*.translation
+
+# Imported resources
+.import/
+
+# Export templates and builds
+export/
+export_presets.cfg
+
+# Mono/.NET specific
+.mono/
+data_*/
+mono_crash.*.json
+
+# IDE
+.vs/
+.vscode/
+*.sln
+*.csproj
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test output
+tests/results/

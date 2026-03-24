@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://c4ekjmpripdji"]
+
+[node name="Main" type="Control" unique_id=1677334875]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=483828612]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1126600518]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer" unique_id=2111835940]
+layout_mode = 2
+text = "GUILDRUNNER"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=921721634]
+layout_mode = 2
+text = "Project scaffold loaded successfully."
+horizontal_alignment = 1

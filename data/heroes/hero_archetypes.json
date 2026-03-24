@@ -1,0 +1,38 @@
+{
+  "FIGHTER": {
+    "strength":   { "min": 58, "max": 78 },
+    "agility":    { "min": 33, "max": 53 },
+    "stealth":    { "min": 18, "max": 38 },
+    "resilience": { "min": 55, "max": 75 },
+    "leadership": { "min": 38, "max": 58 },
+    "upkeep_gold_per_week": 8,
+    "preferred_mission_types": ["ELIMINATE", "DEFEND", "ESCORT"]
+  },
+  "ROGUE": {
+    "strength":   { "min": 33, "max": 50 },
+    "agility":    { "min": 62, "max": 78 },
+    "stealth":    { "min": 68, "max": 83 },
+    "resilience": { "min": 28, "max": 45 },
+    "leadership": { "min": 30, "max": 48 },
+    "upkeep_gold_per_week": 7,
+    "preferred_mission_types": ["RETRIEVE", "EXPLORE", "ELIMINATE"]
+  },
+  "RANGER": {
+    "strength":   { "min": 48, "max": 65 },
+    "agility":    { "min": 55, "max": 72 },
+    "stealth":    { "min": 48, "max": 63 },
+    "resilience": { "min": 43, "max": 60 },
+    "leadership": { "min": 43, "max": 60 },
+    "upkeep_gold_per_week": 7,
+    "preferred_mission_types": ["EXPLORE", "ESCORT", "ELIMINATE"]
+  },
+  "SUPPORT": {
+    "strength":   { "min": 33, "max": 50 },
+    "agility":    { "min": 38, "max": 55 },
+    "stealth":    { "min": 33, "max": 50 },
+    "resilience": { "min": 58, "max": 75 },
+    "leadership": { "min": 63, "max": 78 },
+    "upkeep_gold_per_week": 6,
+    "preferred_mission_types": ["ESCORT", "DEFEND"]
+  }
+}

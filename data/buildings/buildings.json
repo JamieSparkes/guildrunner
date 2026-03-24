@@ -1,0 +1,107 @@
+[
+  {
+    "building_id": "barracks",
+    "display_name": "Barracks",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [150, 350],
+    "build_time_days": [3, 5],
+    "sprite_ids": ["barracks_t0", "barracks_t1", "barracks_t2"],
+    "hub_position": [200, 420],
+    "tier1_effects": [
+      { "type": "max_roster_size", "value": 6 },
+      { "type": "enable_recruitment", "value": true }
+    ],
+    "tier2_effects": [
+      { "type": "max_roster_size", "value": 12 },
+      { "type": "enable_legendary_recruitment", "value": true }
+    ]
+  },
+  {
+    "building_id": "forge",
+    "display_name": "Forge",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [200, 400],
+    "build_time_days": [2, 4],
+    "sprite_ids": ["forge_t0", "forge_t1", "forge_t2"],
+    "hub_position": [450, 500],
+    "tier1_effects": [
+      { "type": "enable_repair", "value": true }
+    ],
+    "tier2_effects": [
+      { "type": "enable_quality_upgrade", "value": true }
+    ]
+  },
+  {
+    "building_id": "infirmary",
+    "display_name": "Infirmary",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [175, 375],
+    "build_time_days": [2, 4],
+    "sprite_ids": ["infirmary_t0", "infirmary_t1", "infirmary_t2"],
+    "hub_position": [700, 360],
+    "tier1_effects": [
+      { "type": "recovery_day_reduction", "value": 1 }
+    ],
+    "tier2_effects": [
+      { "type": "recovery_day_reduction", "value": 2 },
+      { "type": "prevent_minor_to_serious", "value": true }
+    ]
+  },
+  {
+    "building_id": "training_grounds",
+    "display_name": "Training Grounds",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [200, 450],
+    "build_time_days": [3, 5],
+    "sprite_ids": ["training_t0", "training_t1", "training_t2"],
+    "hub_position": [950, 480],
+    "tier1_effects": [
+      { "type": "enable_training", "value": true }
+    ],
+    "tier2_effects": [
+      { "type": "training_speed_multiplier", "value": 1.5 },
+      { "type": "enable_trait_training", "value": true }
+    ]
+  },
+  {
+    "building_id": "tavern",
+    "display_name": "Tavern",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [175, 325],
+    "build_time_days": [2, 3],
+    "sprite_ids": ["tavern_t0", "tavern_t1", "tavern_t2"],
+    "hub_position": [1150, 370],
+    "tier1_effects": [
+      { "type": "morale_recovery_multiplier", "value": 1.2 },
+      { "type": "intervention_tokens", "value": 1 }
+    ],
+    "tier2_effects": [
+      { "type": "morale_recovery_multiplier", "value": 1.5 },
+      { "type": "intervention_tokens", "value": 2 },
+      { "type": "enable_bonding_events", "value": true }
+    ]
+  },
+  {
+    "building_id": "gatehouse",
+    "display_name": "Gatehouse",
+    "current_tier": 0,
+    "max_tier": 2,
+    "build_costs_gold": [300, 600],
+    "build_time_days": [4, 6],
+    "sprite_ids": ["gatehouse_t0", "gatehouse_t1", "gatehouse_t2"],
+    "hub_position": [1600, 400],
+    "tier1_effects": [
+      { "type": "siege_defense_bonus", "value": 10 },
+      { "type": "enable_wall_events", "value": true }
+    ],
+    "tier2_effects": [
+      { "type": "siege_defense_bonus", "value": 25 },
+      { "type": "siege_casualty_reduction", "value": 0.3 }
+    ]
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "first_names": [
+    "Aldric", "Bram", "Cade", "Donal", "Edwyn", "Finn", "Gareth", "Hadric",
+    "Ivo", "Jarvin", "Kael", "Lewin", "Marek", "Ned", "Oswin", "Perrin",
+    "Quintus", "Rolf", "Stellan", "Tor", "Ulric", "Vann", "Wren", "Xander",
+    "Yorick", "Zenn",
+    "Hana", "Mira", "Sera", "Lira", "Bea", "Tova", "Edna", "Corva",
+    "Pip", "Sable", "Rhea", "Liora", "Vessa", "Nara", "Elia", "Cora",
+    "Thea", "Rowena", "Imra", "Yolanda", "Brenna", "Isla", "Fara", "Dessa"
+  ],
+  "last_names": [
+    "Vane", "Ashford", "Mira", "Crane", "Holden", "Thorn", "Weld", "Bray",
+    "Cross", "Fell", "Gale", "Holt", "Irwin", "Ketch", "Lorne", "Marsh",
+    "Nair", "Oakes", "Penn", "Quill", "Reed", "Stone", "Taft", "Underhill",
+    "Vale", "Ward", "Yates", "Zale", "Drake", "Frost", "Glen", "Hart",
+    "Ivory", "Jade", "Kirk", "Lane", "Moor", "Nash", "Orwell", "Prior",
+    "Quinn", "Rook", "Slate", "Tyne", "Umber", "Voss", "Wick", "Yorn"
+  ],
+  "epithets": [
+    "the Bold", "the Silent", "the Steady", "the Quick", "the Grey",
+    "the Scarred", "the Iron", "the Swift", "the Grim", "the Kind",
+    "the Bitter", "the Just", "the Lucky", "of the North", "of the Road",
+    "the Old", "the Young", "the Fortunate", "the Last", "Twice-Born"
+  ]
+}

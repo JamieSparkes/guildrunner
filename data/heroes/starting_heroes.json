@@ -1,0 +1,102 @@
+[
+  {
+    "hero_id": "aldric_vane",
+    "display_name": "Ser Aldric Vane",
+    "archetype": "FIGHTER",
+    "is_legendary": false,
+    "portrait_id": "aldric_vane",
+    "bio": "A former soldier of the Crown, Aldric came to the guild after his regiment was disbanded. He speaks rarely and works constantly. Whatever drove him from the king's service, he has never said.",
+    "personality_type": "STOIC",
+    "personality_blurb": "Speaks little, endures much. Relies on discipline over feeling.",
+    "strength": 68.0,
+    "agility": 42.0,
+    "stealth": 24.0,
+    "resilience": 65.0,
+    "leadership": 48.0,
+    "morale": 80.0,
+    "morale_floor": 20.0,
+    "status": "AVAILABLE",
+    "equipped_weapon": "iron_sword",
+    "equipped_armour": "leather_armour",
+    "equipped_accessory": "",
+    "dialogue_pool_id": "stoic",
+    "bonds": [],
+    "tensions": [
+      {
+        "other_hero_id": "hana_mira",
+        "flavour_text": "A soldier and a thief make uneasy company. Old habits of suspicion die hard.",
+        "morale_modifier": -5.0,
+        "performance_modifier": -2.0
+      }
+    ]
+  },
+  {
+    "hero_id": "hana_mira",
+    "display_name": "Hana Mira",
+    "archetype": "ROGUE",
+    "is_legendary": false,
+    "portrait_id": "hana_mira",
+    "bio": "A city-trained thief turned freelancer. Hana's caution keeps her alive; her skill keeps her employed. She has never explained where she came from, and nobody has pressed the question.",
+    "personality_type": "CAUTIOUS",
+    "personality_blurb": "Measures twice, cuts once. Hesitation has kept this one alive when others haven't.",
+    "strength": 36.0,
+    "agility": 71.0,
+    "stealth": 74.0,
+    "resilience": 32.0,
+    "leadership": 34.0,
+    "morale": 75.0,
+    "morale_floor": 20.0,
+    "status": "AVAILABLE",
+    "equipped_weapon": "daggers",
+    "equipped_armour": "scout_leathers",
+    "equipped_accessory": "travel_cloak",
+    "dialogue_pool_id": "cautious",
+    "bonds": [
+      {
+        "other_hero_id": "pip_ashford",
+        "flavour_text": "They met on the road, both heading somewhere unspecified. They have been looking out for each other since.",
+        "morale_modifier": 5.0,
+        "performance_modifier": 2.0
+      }
+    ],
+    "tensions": [
+      {
+        "other_hero_id": "aldric_vane",
+        "flavour_text": "A soldier and a thief make uneasy company. Old habits of suspicion die hard.",
+        "morale_modifier": -5.0,
+        "performance_modifier": -2.0
+      }
+    ]
+  },
+  {
+    "hero_id": "pip_ashford",
+    "display_name": "Pip Ashford",
+    "archetype": "RANGER",
+    "is_legendary": false,
+    "portrait_id": "pip_ashford",
+    "bio": "Pip has been a ranger since they were old enough to hold a bow. Their good humour is a rarity in this line of work, and most people find it disarming rather than irritating. Most.",
+    "personality_type": "CHEERFUL",
+    "personality_blurb": "Finds something to like in almost any situation. Others find it either infectious or annoying.",
+    "strength": 52.0,
+    "agility": 63.0,
+    "stealth": 55.0,
+    "resilience": 50.0,
+    "leadership": 48.0,
+    "morale": 85.0,
+    "morale_floor": 30.0,
+    "status": "AVAILABLE",
+    "equipped_weapon": "hunting_bow",
+    "equipped_armour": "padded_jacket",
+    "equipped_accessory": "field_kit",
+    "dialogue_pool_id": "cheerful",
+    "bonds": [
+      {
+        "other_hero_id": "hana_mira",
+        "flavour_text": "They met on the road, both heading somewhere unspecified. They have been looking out for each other since.",
+        "morale_modifier": 5.0,
+        "performance_modifier": 2.0
+      }
+    ],
+    "tensions": []
+  }
+]
