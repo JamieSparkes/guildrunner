@@ -1,5 +1,5 @@
 extends PanelContainer
-## A single text line in the mission feed.
+## A single text line in the mission feed, colored by mission or event type.
 ## Call setup() with a FeedEvent before adding to the scene tree.
 
 var _event: FeedEvent = null
@@ -19,6 +19,7 @@ func _ready() -> void:
 
 	if _event != null:
 		label.text = _event.text
+		label.add_theme_color_override("default_color", _event.color)
 
 func setup(event: FeedEvent) -> void:
 	_event = event

@@ -12,6 +12,9 @@ func _ready() -> void:
 	EventBus.day_advanced.connect(_on_day_advanced)
 	EventBus.hero_dispatched.connect(func(_a: String, _b: String) -> void: _refresh_heroes())
 	EventBus.hero_returned.connect(func(_a: String, _b: int) -> void: _refresh_heroes())
+	EventBus.hero_wounded.connect(func(_a: String, _b: int) -> void: _refresh_heroes())
+	EventBus.hero_killed.connect(func(_a: String, _b: String) -> void: _refresh_heroes())
+	EventBus.hero_captured.connect(func(_a: String, _b: String) -> void: _refresh_heroes())
 	_refresh_all()
 
 func _build_ui() -> void:
@@ -45,6 +48,7 @@ func _on_gold_changed(_delta: int, new_total: int) -> void:
 
 func _on_day_advanced(day: int) -> void:
 	_day_label.text = "Day %d" % day
+	_refresh_heroes()
 
 func _refresh_heroes() -> void:
 	var available := HeroManager.get_available_heroes().size()

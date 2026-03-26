@@ -37,6 +37,7 @@ func dispatch_heroes(
 			return ""
 
 	var mission_id := _new_id(contract.contract_id)
+	FeedManager.assign_mission_color(mission_id)
 	var mission := ActiveMission.new()
 	mission.mission_id     = mission_id
 	mission.contract       = contract
@@ -55,6 +56,7 @@ func dispatch_heroes(
 		var hero := HeroManager.get_hero(id)
 		if hero != null:
 			EventBus.feed_event.emit(mission_id, "hero_departed", {
+				"hero_id":     id,
 				"name":        hero.display_name,
 				"personality": _personality_key(hero),
 				"target":      contract.title,
@@ -71,6 +73,13 @@ func update_commitment(mission_id: String, new_commitment: Enums.CommitmentLevel
 ## Return all active missions.
 func get_active_missions() -> Array:
 	return _active.values()
+
+## Return the contract title for a mission, or the mission_id as fallback.
+func get_mission_title(mission_id: String) -> String:
+	var mission: ActiveMission = _active.get(mission_id, null)
+	if mission == null:
+		return mission_id
+	return mission.contract.title
 
 # ── Day tick ──────────────────────────────────────────────────────────────────
 
@@ -165,6 +174,7 @@ func _emit_mission_narrative(
 	for i: int in squad.size():
 		var hero: HeroData = squad[i]
 		var hparams := {
+			"hero_id":     hero.hero_id,
 			"name":        hero.display_name,
 			"personality": _personality_key(hero),
 			"target":      target,

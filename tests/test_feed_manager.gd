@@ -158,3 +158,80 @@ func test_each_event_key_has_at_least_one_variant() -> void:
 			var variants: Array = by_personality[pkey]
 			assert_false(variants.is_empty(),
 					"Event key '%s' personality '%s' has no variants" % [key, pkey])
+
+# ── Color assignment ─────────────────────────────────────────────────────────
+
+func test_assign_mission_color_returns_a_color() -> void:
+	var c: Color = FeedManager.assign_mission_color("m1")
+	assert_true(c != Color.BLACK, "Assigned color is not black (reserved)")
+
+func test_same_mission_gets_same_color() -> void:
+	var c1: Color = FeedManager.assign_mission_color("m1")
+	var c2: Color = FeedManager.assign_mission_color("m1")
+	assert_eq(c1, c2, "Same mission returns same color")
+
+func test_different_missions_get_different_colors() -> void:
+	var c1: Color = FeedManager.assign_mission_color("m1")
+	var c2: Color = FeedManager.assign_mission_color("m2")
+	assert_ne(c1, c2, "Different missions get different colors")
+
+func test_reserved_color_overrides_mission_color_for_injury() -> void:
+	FeedManager.assign_mission_color("m1")
+	FeedManager.push_event("m1", "hero_wounded_minor", {"personality": "STOIC"})
+	var ev: FeedEvent = FeedManager.get_feed("m1")[0]
+	assert_eq(ev.color, FeedManager.RESERVED_EVENT_COLORS["hero_wounded_minor"],
+			"Injury event uses reserved red color")
+
+func test_reserved_color_overrides_for_death() -> void:
+	FeedManager.assign_mission_color("m1")
+	FeedManager.push_event("m1", "hero_died", {"name": "Test", "personality": "STOIC"})
+	var ev: FeedEvent = FeedManager.get_feed("m1")[0]
+	assert_eq(ev.color, FeedManager.RESERVED_EVENT_COLORS["hero_died"],
+			"Death event uses reserved black color")
+
+func test_reserved_color_overrides_for_success() -> void:
+	FeedManager.assign_mission_color("m1")
+	FeedManager.push_event("m1", "outcome_success", {"personality": "STOIC"})
+	var ev: FeedEvent = FeedManager.get_feed("m1")[0]
+	assert_eq(ev.color, FeedManager.RESERVED_EVENT_COLORS["outcome_success"],
+			"Success event uses reserved green color")
+
+func test_normal_event_uses_mission_color() -> void:
+	var mission_color: Color = FeedManager.assign_mission_color("m1")
+	FeedManager.push_event("m1", "hero_departed", {"personality": "STOIC"})
+	var ev: FeedEvent = FeedManager.get_feed("m1")[0]
+	assert_eq(ev.color, mission_color, "Normal event uses assigned mission color")
+
+func test_clear_feed_releases_mission_color() -> void:
+	FeedManager.assign_mission_color("m1")
+	FeedManager.clear_feed("m1")
+	assert_eq(FeedManager.get_mission_color("m1"), Color.WHITE,
+			"After clear_feed, mission color returns white fallback")
+
+# ── Day buffer ───────────────────────────────────────────────────────────────
+
+func test_push_event_appends_to_day_buffer() -> void:
+	FeedManager.push_event("m1", "hero_departed", {"personality": "STOIC"})
+	FeedManager.push_event("m1", "hero_returned", {"personality": "STOIC"})
+	assert_eq(FeedManager.get_day_buffer().size(), 2, "Day buffer has 2 events")
+
+func test_clear_day_buffer() -> void:
+	FeedManager.push_event("m1", "hero_departed", {"personality": "STOIC"})
+	FeedManager.clear_day_buffer()
+	assert_eq(FeedManager.get_day_buffer().size(), 0, "Day buffer is empty after clear")
+	assert_false(FeedManager.has_day_events(), "has_day_events is false after clear")
+
+func test_has_day_events_true_when_buffer_has_events() -> void:
+	FeedManager.push_event("m1", "hero_departed", {"personality": "STOIC"})
+	assert_true(FeedManager.has_day_events(), "has_day_events returns true")
+
+func test_has_day_events_false_when_empty() -> void:
+	assert_false(FeedManager.has_day_events(), "has_day_events returns false on fresh state")
+
+func test_day_buffer_contains_events_from_multiple_missions() -> void:
+	FeedManager.push_event("m1", "hero_departed", {"personality": "STOIC"})
+	FeedManager.push_event("m2", "hero_returned", {"personality": "STOIC"})
+	var buffer: Array = FeedManager.get_day_buffer()
+	assert_eq(buffer.size(), 2, "Day buffer has events from both missions")
+	assert_eq((buffer[0] as FeedEvent).mission_id, "m1")
+	assert_eq((buffer[1] as FeedEvent).mission_id, "m2")

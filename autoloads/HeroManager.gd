@@ -53,7 +53,8 @@ func apply_injury(hero_id: String, severity: Enums.InjurySeverity) -> void:
 	if hero == null:
 		return
 	hero.times_wounded += 1
-	hero.injury_recovery_days = RECOVERY_DAYS[severity]
+	var reduction: int = GuildManager.get_state().recovery_day_reduction
+	hero.injury_recovery_days = max(1, RECOVERY_DAYS[severity] - reduction)
 	hero.current_mission_id = ""
 
 	if severity == Enums.InjurySeverity.MINOR:

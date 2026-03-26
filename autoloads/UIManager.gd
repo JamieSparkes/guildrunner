@@ -9,6 +9,7 @@ const SCREEN_PATHS: Dictionary = {
 	"feed":             "res://ui/screens/FeedScreen.tscn",
 	"hero_roster":      "res://ui/screens/HeroRosterScreen.tscn",
 	"hero_detail":      "res://ui/screens/HeroDetailScreen.tscn",
+	"building":         "res://ui/screens/BuildingScreen.tscn",
 }
 
 var _stack: Array[Node] = []

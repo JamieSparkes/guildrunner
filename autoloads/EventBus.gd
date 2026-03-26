@@ -40,6 +40,7 @@ signal faction_became_ally(faction_id: String)
 
 # ── Guild ─────────────────────────────────────────────────────────────────────
 
+signal building_construction_started(building_id: String, target_tier: int, completion_day: int)
 signal upgrade_built(building_id: String, tier: int)
 signal guild_attacked(source: String, strength: int)
 signal gold_changed(delta: int, new_total: int)

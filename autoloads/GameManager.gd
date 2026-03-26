@@ -87,9 +87,18 @@ func _on_exit_state(_state: Enums.GameState) -> void:
 func _on_enter_state(state: Enums.GameState) -> void:
 	match state:
 		Enums.GameState.MORNING_PHASE:
+			FeedManager.clear_day_buffer()
 			TimeManager.advance_day()
 			# Morning processing is synchronous; return to hub on the next frame
 			# so all day_advanced listeners finish before the state changes again.
-			call_deferred("transition_to", Enums.GameState.GUILD_HUB)
+			call_deferred("_finish_morning_phase")
 		Enums.GameState.NIGHT_PHASE:
 			TimeManager.trigger_night_phase()
+
+func _finish_morning_phase() -> void:
+	transition_to(Enums.GameState.GUILD_HUB)
+	if FeedManager.has_day_events():
+		call_deferred("_auto_open_feed")
+
+func _auto_open_feed() -> void:
+	UIManager.push_screen("feed", {"auto_opened": true})

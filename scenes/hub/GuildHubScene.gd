@@ -70,15 +70,20 @@ func _build_scene() -> void:
 	feed_btn.pressed.connect(_on_mission_feed_pressed)
 	hub_panel.add_child(feed_btn)
 
-	# Placeholder building buttons (enabled in M10)
-	var placeholder_labels: Array[String] = [
-		"Barracks", "Forge", "Infirmary",
-		"Training Grounds", "Tavern", "Gatehouse",
-	]
-	for label: String in placeholder_labels:
+	# Building buttons
+	var building_labels: Dictionary = {
+		"barracks":         "Barracks",
+		"forge":            "Forge",
+		"infirmary":        "Infirmary",
+		"training_grounds": "Training Grounds",
+		"tavern":           "Tavern",
+		"gatehouse":        "Gatehouse",
+	}
+	for building_id: String in building_labels.keys():
 		var btn := Button.new()
-		btn.text = "%s  (locked)" % label
-		btn.disabled = true
+		btn.text = building_labels[building_id]
+		var captured_id := building_id
+		btn.pressed.connect(func() -> void: UIManager.push_screen("building"))
 		hub_panel.add_child(btn)
 
 	hub_panel.add_child(HSeparator.new())

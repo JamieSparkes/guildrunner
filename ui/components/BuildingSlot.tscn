@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bslot000001"]
+
+[ext_resource type="Script" path="res://ui/components/BuildingSlot.gd" id="1_bslot"]
+
+[node name="BuildingSlot" type="PanelContainer"]
+script = ExtResource("1_bslot")

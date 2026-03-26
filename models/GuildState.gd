@@ -30,6 +30,12 @@ class_name GuildState extends Resource
 ## 0 = no Tavern; 1 = Tavern T1; 2 = Tavern T2.
 @export var max_intervention_tokens: int = 0
 
+# ── Building effects ──────────────────────────────────────────────────────────
+## Days subtracted from injury recovery time. Set by Infirmary.
+@export var recovery_day_reduction: int = 0
+## Catch-all for future building effects (enable_*, multipliers, siege bonuses).
+@export var building_flags: Dictionary = {}
+
 # ── Contracts ─────────────────────────────────────────────────────────────────
 @export var active_contract_ids: Array[String] = []
 ## Pending faction consequences awaiting resolution.
