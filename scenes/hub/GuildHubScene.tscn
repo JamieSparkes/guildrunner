@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ghub000001"]
+
+[ext_resource type="Script" path="res://scenes/hub/GuildHubScene.gd" id="1_ghub"]
+
+[node name="GuildHubScene" type="Control"]
+script = ExtResource("1_ghub")

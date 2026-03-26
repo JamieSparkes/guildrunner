@@ -51,6 +51,14 @@ func dispatch_heroes(
 		HeroManager.set_status(id, Enums.HeroStatus.ON_MISSION)
 		HeroManager.set_current_mission(id, mission_id)
 		EventBus.hero_dispatched.emit(id, mission_id)
+		# Emit departure feed event immediately so the player sees something.
+		var hero := HeroManager.get_hero(id)
+		if hero != null:
+			EventBus.feed_event.emit(mission_id, "hero_departed", {
+				"name":        hero.display_name,
+				"personality": _personality_key(hero),
+				"target":      contract.title,
+			})
 
 	EventBus.contract_accepted.emit(contract.contract_id)
 	return mission_id
@@ -87,40 +95,107 @@ func _resolve_mission(mission: ActiveMission) -> void:
 
 	var result := MissionResolver.resolve_mission(contract, squad, mission.commitment, _item_db)
 
+	# Pre-compute per-hero outcomes so we can emit narrative before applying state.
+	var outcomes: Array = []
+	for hero: HeroData in squad:
+		outcomes.append(InjuryResolver.resolve_hero_outcome(
+			hero, result, mission.commitment, contract.difficulty
+		))
+
+	# Emit full narrative feed sequence.
+	_emit_mission_narrative(mission, squad, result, outcomes)
+
+	# Apply gold reward.
 	match result:
 		Enums.MissionResult.FULL_SUCCESS, Enums.MissionResult.SUCCESS:
 			GuildManager.add_gold(contract.reward_gold)
 		Enums.MissionResult.PARTIAL:
 			GuildManager.add_gold(contract.reward_gold_partial)
 
-	# Rep application wired in M11
 	_apply_rep(contract, result)
 
-	for hero: HeroData in squad:
-		_resolve_hero(hero, result, mission.commitment, contract)
+	# Apply per-hero outcomes and update history.
+	for i: int in squad.size():
+		_apply_hero_outcome(squad[i], outcomes[i], result, contract, mission.mission_id)
 
 	EventBus.contract_completed.emit(
 		contract.contract_id, result != Enums.MissionResult.FAILURE
 	)
 	_active.erase(mission.mission_id)
 
-func _resolve_hero(
-	hero: HeroData,
+func _emit_mission_narrative(
+	mission: ActiveMission,
+	squad: Array[HeroData],
 	result: Enums.MissionResult,
-	commitment: Enums.CommitmentLevel,
-	contract: ContractData
+	outcomes: Array
 ) -> void:
-	var outcome := InjuryResolver.resolve_hero_outcome(
-		hero, result, commitment, contract.difficulty
-	)
+	var mid := mission.mission_id
+	var target := mission.contract.title
+	# Use the lead hero's personality for shared events.
+	var lead: HeroData = squad[0]
+	var base_params := {
+		"name":        lead.display_name,
+		"personality": _personality_key(lead),
+		"target":      target,
+	}
 
+	EventBus.feed_event.emit(mid, "travel_uneventful", base_params)
+	EventBus.feed_event.emit(mid, "arrival", base_params)
+
+	var encounter_pool: Array[String] = [
+		"encounter_skirmish", "encounter_ambush",
+		"encounter_obstacle", "encounter_discovery",
+	]
+	for _i: int in randi_range(2, 4):
+		EventBus.feed_event.emit(
+			mid,
+			encounter_pool[randi() % encounter_pool.size()],
+			base_params
+		)
+
+	var outcome_key := ""
+	match result:
+		Enums.MissionResult.FULL_SUCCESS: outcome_key = "outcome_full_success"
+		Enums.MissionResult.SUCCESS:      outcome_key = "outcome_success"
+		Enums.MissionResult.PARTIAL:      outcome_key = "outcome_partial"
+		_:                                outcome_key = "outcome_failure"
+	EventBus.feed_event.emit(mid, outcome_key, base_params)
+
+	# Per-hero epilogue.
+	for i: int in squad.size():
+		var hero: HeroData = squad[i]
+		var hparams := {
+			"name":        hero.display_name,
+			"personality": _personality_key(hero),
+			"target":      target,
+		}
+		var outcome: Dictionary = outcomes[i]
+		if outcome["died"]:
+			EventBus.feed_event.emit(mid, "hero_died", hparams)
+		elif outcome["captured"]:
+			EventBus.feed_event.emit(mid, "hero_captured", hparams)
+		elif outcome["injured"]:
+			var sev: int = outcome["severity"]
+			var wkey := "hero_wounded_minor" \
+				if sev == Enums.InjurySeverity.MINOR else "hero_wounded_serious"
+			EventBus.feed_event.emit(mid, wkey, hparams)
+		else:
+			EventBus.feed_event.emit(mid, "hero_returned", hparams)
+
+func _apply_hero_outcome(
+	hero: HeroData,
+	outcome: Dictionary,
+	result: Enums.MissionResult,
+	contract: ContractData,
+	mission_id: String
+) -> void:
 	_update_history(hero, contract, result, outcome)
 
 	if outcome["died"]:
-		HeroManager.kill_hero(hero.hero_id, "")
+		HeroManager.kill_hero(hero.hero_id, mission_id)
 		return
 	if outcome["captured"]:
-		HeroManager.capture_hero(hero.hero_id, "")
+		HeroManager.capture_hero(hero.hero_id, mission_id)
 		return
 	if outcome["injured"]:
 		HeroManager.apply_injury(hero.hero_id, outcome["severity"])
@@ -154,6 +229,10 @@ func _apply_rep(_contract: ContractData, _result: Enums.MissionResult) -> void:
 func _new_id(contract_id: String) -> String:
 	_counter += 1
 	return "mission_%d_%s" % [_counter, contract_id]
+
+## Convert a hero's personality_type int to the JSON key string (e.g. "STOIC").
+func _personality_key(hero: HeroData) -> String:
+	return Enums.PersonalityType.keys()[hero.personality_type]
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 

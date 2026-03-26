@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://fcolumn0001"]
+
+[ext_resource type="Script" path="res://ui/components/FeedColumn.gd" id="1_fcolumn"]
+
+[node name="FeedColumn" type="ScrollContainer"]
+script = ExtResource("1_fcolumn")

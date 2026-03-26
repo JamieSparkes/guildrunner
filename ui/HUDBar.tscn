@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://hudbar0001"]
+
+[ext_resource type="Script" path="res://ui/HUDBar.gd" id="1_hudbar"]
+
+[node name="HUDBar" type="HBoxContainer"]
+script = ExtResource("1_hudbar")

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://mnscreen001"]
+
+[ext_resource type="Script" path="res://ui/screens/MainMenuScreen.gd" id="1_mainmenu"]
+
+[node name="MainMenuScreen" type="Control"]
+script = ExtResource("1_mainmenu")

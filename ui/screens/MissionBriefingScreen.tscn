@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://mbrief0001"]
+
+[ext_resource type="Script" path="res://ui/screens/MissionBriefingScreen.gd" id="1_mbrief"]
+
+[node name="MissionBriefingScreen" type="Control"]
+script = ExtResource("1_mbrief")

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://hdetail0001"]
+
+[ext_resource type="Script" path="res://ui/screens/HeroDetailScreen.gd" id="1_hdetail"]
+
+[node name="HeroDetailScreen" type="Control"]
+script = ExtResource("1_hdetail")

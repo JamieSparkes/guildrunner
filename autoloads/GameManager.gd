@@ -59,6 +59,22 @@ func can_transition_to(new_state: Enums.GameState) -> bool:
 		return true
 	return new_state in _transitions.get(current_state, [])
 
+## Bootstrap a new game: reset all systems, load starting heroes, switch to hub.
+## M13 will replace the _reset_for_test helpers with proper save-compatible init.
+func start_new_game() -> void:
+	TimeManager._reset_for_test()
+	GuildManager._reset_for_test()
+	MissionManager._reset_for_test()
+	ContractQueue._reset_for_test()
+	FeedManager._reset_for_test()
+	HeroManager._clear_roster_for_test()
+	for hero: HeroData in DataLoader.load_starting_heroes():
+		HeroManager._inject_hero_for_test(hero)
+	# Bypass the normal transition table — game is bootstrapping from scratch.
+	current_state = Enums.GameState.GUILD_HUB
+	EventBus.state_changed.emit(Enums.GameState.MAIN_MENU, Enums.GameState.GUILD_HUB)
+	get_tree().change_scene_to_file("res://scenes/hub/GuildHubScene.tscn")
+
 ## Resets the FSM to MAIN_MENU. For use in GUT tests only.
 func _reset_for_test() -> void:
 	current_state = Enums.GameState.MAIN_MENU
@@ -66,11 +82,14 @@ func _reset_for_test() -> void:
 # ── Entry / exit hooks ────────────────────────────────────────────────────────
 
 func _on_exit_state(_state: Enums.GameState) -> void:
-	pass  # Wired in M3+
+	pass
 
 func _on_enter_state(state: Enums.GameState) -> void:
 	match state:
 		Enums.GameState.MORNING_PHASE:
 			TimeManager.advance_day()
+			# Morning processing is synchronous; return to hub on the next frame
+			# so all day_advanced listeners finish before the state changes again.
+			call_deferred("transition_to", Enums.GameState.GUILD_HUB)
 		Enums.GameState.NIGHT_PHASE:
 			TimeManager.trigger_night_phase()

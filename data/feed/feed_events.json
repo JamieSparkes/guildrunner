@@ -1,0 +1,148 @@
+{
+  "hero_departed": {
+    "STOIC":    ["{name} departs without ceremony.", "{name} sets out at dawn, as is their way."],
+    "RECKLESS": ["{name} charges headlong towards {target}!", "{name} rides out before first light, raring for a fight."],
+    "LOYAL":    ["{name} sets out, sworn to return with honour.", "{name} departs with the guild's honour in their hands."],
+    "CYNICAL":  ["{name} leaves. Probably won't die.", "{name} mutters something about coin and heads out."],
+    "CHEERFUL": ["{name} waves cheerfully and sets off!", "{name} hums a tune on the road to {target}."],
+    "GRIM":     ["{name} departs in silence.", "{name} walks out into the grey morning without a word."],
+    "CAUTIOUS": ["{name} double-checks their kit and departs.", "{name} takes a final look at the map before heading out."],
+    "PROUD":    ["{name} strides out, head held high.", "{name} departs with all the bearing of one born for this."]
+  },
+  "travel_uneventful": {
+    "STOIC":    ["The road to {target} passes without incident.", "{name} makes steady progress."],
+    "RECKLESS": ["{name} pushes hard, barely pausing to rest.", "{name} is already impatient by midday."],
+    "LOYAL":    ["{name} keeps a watchful eye throughout the journey.", "The road is quiet. {name} is grateful for it."],
+    "CYNICAL":  ["Nothing happens. For once.", "{name} expected trouble. None came. Suspicious."],
+    "CHEERFUL": ["{name} enjoys the scenery on the way to {target}.", "The journey is pleasant. {name} wouldn't have it any other way."],
+    "GRIM":     ["Miles pass. {name} says nothing.", "The road to {target} is long and silent."],
+    "CAUTIOUS": ["{name} scouts ahead at every bend.", "Slow and careful — {name} arrives without incident."],
+    "PROUD":    ["{name} attracts a few curious looks on the road.", "People step aside for {name}. Good."]
+  },
+  "arrival": {
+    "STOIC":    ["{name} arrives at {target}.", "{name} reaches the destination and surveys the ground."],
+    "RECKLESS": ["{name} arrives at {target} at full gallop.", "{name} hits the ground running."],
+    "LOYAL":    ["{name} arrives at {target}, ready to see this through.", "The destination is in sight. {name} straightens up."],
+    "CYNICAL":  ["{name} arrives. It looks worse than expected.", "This must be {target}. Charming."],
+    "CHEERFUL": ["{name} arrives at {target} in good spirits!", "Here we go. {name} is ready."],
+    "GRIM":     ["{name} arrives. The work begins.", "There it is. {name} studies the site in silence."],
+    "CAUTIOUS": ["{name} approaches {target} carefully, watching for signs of danger.", "{name} arrives and pauses to assess before moving in."],
+    "PROUD":    ["{name} arrives at {target}. Time to show what they're made of.", "They'll remember this visit."]
+  },
+  "encounter_skirmish": {
+    "STOIC":    ["{name} cuts through the opposition efficiently.", "A skirmish. {name} handles it without drama."],
+    "RECKLESS": ["{name} throws themselves into the fight with abandon!", "Blades and shouting — {name} is in their element."],
+    "LOYAL":    ["{name} holds the line, determined not to fail the guild.", "They push through together."],
+    "CYNICAL":  ["Of course there's a fight. {name} sighs and draws their weapon.", "It was always going to come to blows."],
+    "CHEERFUL": ["{name} tackles the skirmish with surprising enthusiasm!", "A quick scrap — nothing {name} can't handle."],
+    "GRIM":     ["{name} dispatches the enemy with cold efficiency.", "More bodies on the road. {name} moves on."],
+    "CAUTIOUS": ["{name} picks their moment carefully and gains the upper hand.", "{name} doesn't rush — the skirmish ends on their terms."],
+    "PROUD":    ["{name} demonstrates exactly why they were chosen for this.", "The enemy learns a hard lesson."]
+  },
+  "encounter_ambush": {
+    "STOIC":    ["{name} is ambushed but holds steady.", "An ambush. {name} fights free with controlled precision."],
+    "RECKLESS": ["{name} walks into a trap — and laughs about it.", "Ambush! {name} turns it back on them."],
+    "LOYAL":    ["{name} doesn't panic. The guild is counting on them.", "Caught off guard, but {name} refuses to break."],
+    "CYNICAL":  ["They were waiting. Of course they were. {name} adapts.", "Nobody told {name} it would be easy. They manage."],
+    "CHEERFUL": ["{name} is caught in an ambush but keeps their wits!", "Nasty surprise, but {name} pulls through."],
+    "GRIM":     ["{name} anticipated treachery. They were right.", "The ambush costs time but not the mission."],
+    "CAUTIOUS": ["{name}'s careful approach gives them just enough warning.", "An ambush, but {name} saw the signs in time."],
+    "PROUD":    ["{name} refuses to be seen struggling. They push through regardless.", "No trap can stop someone of {name}'s calibre."]
+  },
+  "encounter_obstacle": {
+    "STOIC":    ["{name} finds a route around the obstacle.", "Progress is slowed, but {name} doesn't waver."],
+    "RECKLESS": ["{name} tries to barrel through. Mostly works.", "An obstacle. {name} charges it anyway."],
+    "LOYAL":    ["{name} pauses, thinks it through, and finds a way.", "They didn't come this far to be stopped now."],
+    "CYNICAL":  ["Of course there's a complication. {name} deals with it.", "Naturally. {name} was expecting this sort of thing."],
+    "CHEERFUL": ["{name} makes the best of a bad situation!", "A small setback. Nothing to worry about, says {name}."],
+    "GRIM":     ["{name} removes the obstacle. One way or another.", "It takes time, but {name} is not easily stopped."],
+    "CAUTIOUS": ["{name} evaluates all options before committing.", "A careful detour keeps {name} on track."],
+    "PROUD":    ["{name} refuses to be inconvenienced long.", "They improvise — flawlessly, naturally."]
+  },
+  "encounter_discovery": {
+    "STOIC":    ["{name} notes something unusual and files it away.", "An unexpected find. Useful, perhaps."],
+    "RECKLESS": ["{name} dives in without a second thought.", "Curiosity wins out. {name} investigates immediately."],
+    "LOYAL":    ["{name} keeps the guild in mind — this could be valuable.", "Worth reporting back. {name} makes a note."],
+    "CYNICAL":  ["Something worth having, probably cursed. {name} takes it anyway.", "Everyone wants something. Including whoever left this here."],
+    "CHEERFUL": ["{name} makes an exciting find!", "An unexpected discovery puts a spring in {name}'s step."],
+    "GRIM":     ["{name} catalogues what they find and moves on.", "A discovery. Could be worse."],
+    "CAUTIOUS": ["{name} examines the find carefully before touching anything.", "{name} is thorough. The discovery is noted and secured."],
+    "PROUD":    ["{name} claims it, naturally.", "Only fitting that someone of {name}'s skill should make such a find."]
+  },
+  "outcome_success": {
+    "STOIC":    ["The job is done.", "Mission complete. {name} prepares to return."],
+    "RECKLESS": ["Messy, but it worked. {name} grins.", "Done! Barely, but done."],
+    "LOYAL":    ["{name} sees it through to the end.", "The guild won't be disappointed."],
+    "CYNICAL":  ["Somehow, it worked. Don't ask {name} how.", "Mission complete. Against all reasonable expectation."],
+    "CHEERFUL": ["Success! {name} couldn't be more pleased.", "They did it!"],
+    "GRIM":     ["It's done. {name} turns for home.", "Success. No celebration. Just the long road back."],
+    "CAUTIOUS": ["Exactly as planned. {name} permits themselves a small measure of satisfaction.", "Careful work pays off."],
+    "PROUD":    ["{name} delivers. As expected.", "A job worthy of their reputation."]
+  },
+  "outcome_failure": {
+    "STOIC":    ["The mission fails. {name} withdraws in order.", "They couldn't see it through. {name} returns."],
+    "RECKLESS": ["{name} pushes too hard and it falls apart.", "Gone wrong. {name} blames bad luck, mostly."],
+    "LOYAL":    ["Failure. The weight of it is heavy on {name}.", "{name} couldn't do enough. They'll carry this."],
+    "CYNICAL":  ["Failed. Didn't see that coming. Well, actually {name} did.", "As predicted. More or less."],
+    "CHEERFUL": ["Things don't go as hoped, but {name} keeps their chin up.", "A setback. {name} stays positive."],
+    "GRIM":     ["It ends in failure. {name} withdraws.", "Nothing to show for it."],
+    "CAUTIOUS": ["{name} cuts their losses rather than risk more.", "The mission fails, but {name} gets out intact."],
+    "PROUD":    ["Failure. {name} is not pleased about this.", "This won't go unmentioned. {name} expects to do better."]
+  },
+  "outcome_partial": {
+    "STOIC":    ["Partial success. Something salvaged from the attempt.", "Not all was lost. {name} withdraws with what they have."],
+    "RECKLESS": ["{name} pulls something out of the wreckage.", "Half a job. Better than nothing."],
+    "LOYAL":    ["Not everything, but enough. {name} returns.", "They held the line as long as they could."],
+    "CYNICAL":  ["Something, at least. Don't expect gratitude.", "A partial success. Which is to say, a partial failure."],
+    "CHEERFUL": ["{name} makes the most of a mixed result!", "It wasn't perfect, but {name} found a silver lining."],
+    "GRIM":     ["The mission yields some results. Not all.", "Partial. {name} has little to say about it."],
+    "CAUTIOUS": ["{name} secures what can be secured and withdraws.", "A measured result. Acceptable."],
+    "PROUD":    ["{name} is unsatisfied, but returns with something.", "Partial success. {name} will demand better of themselves."]
+  },
+  "outcome_full_success": {
+    "STOIC":    ["The mission is a complete success.", "Everything achieved. {name} heads home."],
+    "RECKLESS": ["{name} exceeds all expectations — somehow!", "Against all odds, a perfect result!"],
+    "LOYAL":    ["Beyond what was asked. {name} is proud.", "The guild could not have asked for more."],
+    "CYNICAL":  ["Huh. A full success. Mark the date.", "Complete success. {name} tries not to look surprised."],
+    "CHEERFUL": ["Outstanding! {name} is over the moon!", "A perfect result — {name} is absolutely beaming."],
+    "GRIM":     ["Complete success. {name} allows a quiet exhale.", "Everything done. Well done."],
+    "CAUTIOUS": ["{name}'s thorough preparation produces an exceptional outcome.", "No detail overlooked. No objective missed."],
+    "PROUD":    ["{name} excels. Naturally.", "A complete and total success. As it should be."]
+  },
+  "hero_wounded_minor": {
+    "STOIC":    ["{name} takes a wound but walks away from it.", "A minor injury. {name} gives it no more thought than it deserves."],
+    "RECKLESS": ["{name} bleeds a little. Adds character.", "A scratch. {name} barely slows down."],
+    "LOYAL":    ["{name} is hurt but refuses to show it.", "They were lucky. They know it."],
+    "CYNICAL":  ["A wound. Of course. {name} expected as much.", "{name} catches a blade. Not the first time."],
+    "CHEERFUL": ["Ouch! That stings, laughs {name}.", "{name} shrugs off the injury with good humour."],
+    "GRIM":     ["{name} is wounded. They've had worse.", "It hurts. {name} will live."],
+    "CAUTIOUS": ["{name} is caught off guard — once. It won't happen again.", "A minor wound. {name} reassesses their approach."],
+    "PROUD":    ["{name} would prefer to deny the injury, but can't.", "A wound. {name} refuses to make a fuss."]
+  },
+  "hero_wounded_serious": {
+    "STOIC":    ["{name} suffers a serious wound and withdraws.", "Badly hurt. {name} holds on through gritted teeth."],
+    "RECKLESS": ["{name} went too far this time. Serious injury.", "The recklessness finally catches up with {name}."],
+    "LOYAL":    ["{name} takes a grievous wound in service to the mission.", "Seriously injured. But they didn't break."],
+    "CYNICAL":  ["Bad luck. Or bad judgement. Hard to tell with {name}.", "{name} is badly hurt. Saw it coming."],
+    "CHEERFUL": ["{name} is seriously injured. Even they can't smile through this one.", "The wound is bad. {name} is going to need time."],
+    "GRIM":     ["{name} is gravely wounded. Comes with the work.", "The injury is serious. {name} doesn't complain."],
+    "CAUTIOUS": ["Despite everything, {name} takes a serious wound.", "This one requires time to heal properly. {name} knows it."],
+    "PROUD":    ["{name} will not speak of this wound. But it's bad.", "Seriously hurt. {name}'s pride takes as much damage as their body."]
+  },
+  "hero_died": {
+    "DEFAULT": ["{name} does not return.", "{name} falls on the field. The guild mourns.", "Word comes back. {name} is gone."]
+  },
+  "hero_captured": {
+    "DEFAULT": ["{name} is taken captive.", "{name} does not return — at least, not yet.", "Enemy hands hold {name}. For now."]
+  },
+  "hero_returned": {
+    "STOIC":    ["{name} returns.", "{name} is back. No fanfare required."],
+    "RECKLESS": ["{name} rides in, grinning like a fool.", "{name} returns, somehow intact."],
+    "LOYAL":    ["{name} returns as promised.", "They're back. The guild breathes easier."],
+    "CYNICAL":  ["{name} comes back. Surprised them all.", "Returns alive. Barely worth mentioning, says {name}."],
+    "CHEERFUL": ["{name} returns, full of stories!", "There they are! {name} is home."],
+    "GRIM":     ["{name} returns. Says nothing.", "Home. {name} finds a corner and sits."],
+    "CAUTIOUS": ["{name} returns, every piece accounted for.", "A careful exit. {name} made it back."],
+    "PROUD":    ["{name} returns with their reputation intact.", "Home again. {name} accepts the welcome with appropriate dignity."]
+  }
+}

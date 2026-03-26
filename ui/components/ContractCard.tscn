@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ccard00001"]
+
+[ext_resource type="Script" path="res://ui/components/ContractCard.gd" id="1_ccard"]
+
+[node name="ContractCard" type="PanelContainer"]
+script = ExtResource("1_ccard")

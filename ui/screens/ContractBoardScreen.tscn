@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cboard0001"]
+
+[ext_resource type="Script" path="res://ui/screens/ContractBoardScreen.gd" id="1_cboard"]
+
+[node name="ContractBoardScreen" type="Control"]
+script = ExtResource("1_cboard")

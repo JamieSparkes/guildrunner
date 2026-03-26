@@ -209,6 +209,18 @@ static func _hero_from_dict(entry: Dictionary) -> HeroData:
 		hd.tensions.append(rel)
 	return hd
 
+# ── Feed Event Template Loader ────────────────────────────────────────────────
+
+## Loads feed event templates from res://data/feed/feed_events.json.
+## Returns the raw structure: { event_key: { personality_key: [String variants] } }
+static func load_feed_event_templates() -> Dictionary:
+	var raw: Variant = load_json("res://data/feed/feed_events.json")
+	if raw == null or not raw is Dictionary:
+		return {}
+	return raw
+
+# ── Hero Loaders ──────────────────────────────────────────────────────────────
+
 ## Loads archetype attribute ranges from hero_archetypes.json.
 ## Returns a Dictionary keyed by archetype name string.
 static func load_hero_archetypes() -> Dictionary:
