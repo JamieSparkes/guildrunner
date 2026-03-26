@@ -8,10 +8,19 @@ const BUILDING_ORDER: Array[String] = [
 	"training_grounds", "tavern", "gatehouse",
 ]
 
+var _gold_lbl: Label
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	EventBus.building_construction_result.connect(_on_building_construction_result)
+	EventBus.gold_changed.connect(_on_gold_changed)
 	_build_ui()
+
+func _exit_tree() -> void:
+	if EventBus.building_construction_result.is_connected(_on_building_construction_result):
+		EventBus.building_construction_result.disconnect(_on_building_construction_result)
+	if EventBus.gold_changed.is_connected(_on_gold_changed):
+		EventBus.gold_changed.disconnect(_on_gold_changed)
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
@@ -37,10 +46,9 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 
-	var gold_lbl := Label.new()
-	gold_lbl.text = "Gold: %d" % GuildManager.get_state().gold
-	header.add_child(gold_lbl)
-	EventBus.gold_changed.connect(func(_d: int, n: int) -> void: gold_lbl.text = "Gold: %d" % n)
+	_gold_lbl = Label.new()
+	_gold_lbl.text = "Gold: %d" % GuildManager.get_state().gold
+	header.add_child(_gold_lbl)
 
 	var close_btn := Button.new()
 	close_btn.text = "Close"
@@ -88,3 +96,7 @@ func _on_building_construction_result(building_id: String, success: bool, error:
 	if success:
 		return
 	push_warning("BuildingScreen: construction failed for '%s' (%s)" % [building_id, error])
+
+func _on_gold_changed(_delta: int, new_total: int) -> void:
+	if _gold_lbl != null and is_instance_valid(_gold_lbl):
+		_gold_lbl.text = "Gold: %d" % new_total
