@@ -29,9 +29,12 @@ func trigger_night_phase() -> void:
 	EventBus.night_began.emit(current_day)
 
 ## Reset to day 1 / morning. For use in GUT tests and new-game setup.
-func _reset_for_test() -> void:
+func reset_runtime_state() -> void:
 	current_day = 1
 	phase = Enums.DayPhase.MORNING
+
+func _reset_for_test() -> void:
+	reset_runtime_state()
 
 # ── Internal ──────────────────────────────────────────────────────────────────
 
@@ -39,7 +42,7 @@ func _resolve_night_events() -> void:
 	pass  # Wired by NightEventManager in M16
 
 func _deliver_morning_contracts() -> void:
-	ContractQueue.on_morning_phase(current_day)  # Wired in M5
+	EventBus.morning_phase_started.emit(current_day)
 
 func _check_weekly_upkeep() -> void:
 	if current_day % 7 == 0:

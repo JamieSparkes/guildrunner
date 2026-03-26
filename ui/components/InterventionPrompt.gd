@@ -74,9 +74,5 @@ func _ready() -> void:
 	vbox.add_child(dismiss_btn)
 
 func _on_commitment_chosen(level: int) -> void:
-	if not GuildManager.spend_intervention_token():
-		queue_free()
-		return
-	MissionManager.update_commitment(_mission_id, level as Enums.CommitmentLevel)
-	EventBus.intervention_used.emit(_mission_id, level)
+	EventBus.cmd_use_intervention.emit(_mission_id, level)
 	queue_free()

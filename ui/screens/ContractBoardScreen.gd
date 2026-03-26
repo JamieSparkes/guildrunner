@@ -49,7 +49,7 @@ func _build_ui() -> void:
 
 	var close_btn := Button.new()
 	close_btn.text = "Close"
-	close_btn.pressed.connect(UIManager.pop_screen)
+	close_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	header.add_child(close_btn)
 
 	vbox.add_child(HSeparator.new())
@@ -87,4 +87,4 @@ func _on_contracts_changed(_id: String = "") -> void:
 	_populate_contracts()
 
 func _on_contract_selected(contract: ContractData) -> void:
-	UIManager.push_screen("mission_briefing", {"contract": contract})
+	EventBus.cmd_open_screen.emit("mission_briefing", {"contract": contract})

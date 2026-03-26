@@ -120,5 +120,8 @@ func spend_intervention_token() -> bool:
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 
-func _reset_for_test() -> void:
+func reset_runtime_state() -> void:
 	_init_state()
+
+func _reset_for_test() -> void:
+	reset_runtime_state()

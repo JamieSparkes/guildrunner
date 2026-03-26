@@ -94,7 +94,12 @@ func _on_day_advanced(_day: int) -> void:
 			hero.injury_recovery_days = 0
 			hero.status = Enums.HeroStatus.AVAILABLE
 
-# ── Test helpers ──────────────────────────────────────────────────────────────
+# ── Runtime / Test helpers ───────────────────────────────────────────────────
+
+func reset_runtime_state() -> void:
+	_heroes.clear()
+	for hero: HeroData in DataLoader.load_starting_heroes():
+		_heroes[hero.hero_id] = hero
 
 func _inject_hero_for_test(hero: HeroData) -> void:
 	_heroes[hero.hero_id] = hero

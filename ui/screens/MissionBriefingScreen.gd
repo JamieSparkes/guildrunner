@@ -24,6 +24,7 @@ func setup(data: Dictionary) -> void:
 
 func _ready() -> void:
 	_build_ui()
+	EventBus.mission_dispatch_result.connect(_on_mission_dispatch_result)
 	if _contract != null:
 		_populate_contract()
 		_populate_heroes()
@@ -125,7 +126,7 @@ func _build_ui() -> void:
 	var back_btn := Button.new()
 	back_btn.text = "Back"
 	back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	back_btn.pressed.connect(UIManager.pop_screen)
+	back_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	btn_row.add_child(back_btn)
 
 	_dispatch_btn = Button.new()
@@ -176,10 +177,10 @@ func _on_dispatch_pressed() -> void:
 		_status_lbl.text = "This contract requires at least %d hero(es)." % _contract.min_heroes
 		return
 
-	var mission_id := MissionManager.dispatch_heroes(_contract, selected_ids, _commitment)
-	if mission_id.is_empty():
-		_status_lbl.text = "Dispatch failed. Check hero availability."
-		return
+	EventBus.cmd_dispatch_contract.emit(_contract, selected_ids, _commitment)
 
-	ContractQueue.remove_contract(_contract.contract_id)
-	UIManager.clear_screens()
+func _on_mission_dispatch_result(success: bool, _mission_id: String, error: String) -> void:
+	if success:
+		_status_lbl.text = ""
+		return
+	_status_lbl.text = error

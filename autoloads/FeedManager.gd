@@ -207,13 +207,16 @@ func _on_feed_event(mission_id: String, event_key: String, params: Dictionary) -
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 
-func _reset_for_test() -> void:
+func reset_runtime_state() -> void:
 	active_feeds.clear()
 	_pending_interventions.clear()
 	_mission_colors.clear()
 	_hero_colors.clear()
 	_color_index = 0
 	_day_buffer.clear()
+
+func _reset_for_test() -> void:
+	reset_runtime_state()
 
 func _inject_templates_for_test(templates: Dictionary) -> void:
 	_templates = templates

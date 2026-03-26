@@ -9,6 +9,7 @@ var _counter: int = 0
 
 func _ready() -> void:
 	_templates = DataLoader.load_contract_templates()
+	EventBus.morning_phase_started.connect(on_morning_phase)
 
 ## Called by TimeManager each morning. Expires old contracts and refills the board.
 func on_morning_phase(day: int) -> void:
@@ -83,9 +84,12 @@ func _generate_contract(day: int) -> ContractData:
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 
-func _reset_for_test() -> void:
+func reset_runtime_state() -> void:
 	active_contracts.clear()
 	_counter = 0
+
+func _reset_for_test() -> void:
+	reset_runtime_state()
 
 func _inject_templates_for_test(templates: Dictionary) -> void:
 	_templates = templates

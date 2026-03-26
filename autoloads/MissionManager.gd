@@ -246,6 +246,11 @@ func _personality_key(hero: HeroData) -> String:
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 
+func reset_runtime_state() -> void:
+	_active.clear()
+	_counter = 0
+	_item_db = DataLoader.load_item_definitions()
+
 func _reset_for_test() -> void:
 	_active.clear()
 	_counter = 0

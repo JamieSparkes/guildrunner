@@ -57,7 +57,7 @@ func _build_ui() -> void:
 
 	var back_btn := Button.new()
 	back_btn.text = "Back"
-	back_btn.pressed.connect(UIManager.pop_screen)
+	back_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	header.add_child(back_btn)
 
 	vbox.add_child(HSeparator.new())

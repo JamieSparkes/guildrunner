@@ -49,7 +49,7 @@ func _build_ui() -> void:
 
 	var close_btn := Button.new()
 	close_btn.text = "Close"
-	close_btn.pressed.connect(UIManager.pop_screen)
+	close_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	header.add_child(close_btn)
 
 	outer.add_child(HSeparator.new())

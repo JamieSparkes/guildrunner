@@ -10,6 +10,7 @@ const BUILDING_ORDER: Array[String] = [
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	EventBus.building_construction_result.connect(_on_building_construction_result)
 	_build_ui()
 
 func _build_ui() -> void:
@@ -43,7 +44,7 @@ func _build_ui() -> void:
 
 	var close_btn := Button.new()
 	close_btn.text = "Close"
-	close_btn.pressed.connect(UIManager.pop_screen)
+	close_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	header.add_child(close_btn)
 
 	outer.add_child(HSeparator.new())
@@ -81,6 +82,9 @@ func _build_ui() -> void:
 		slot.build_requested.connect(_on_build_requested)
 
 func _on_build_requested(building_id: String) -> void:
-	var success := BuildingManager.begin_construction(building_id)
-	if not success:
-		push_warning("BuildingScreen: construction failed for '%s'" % building_id)
+	EventBus.cmd_begin_construction.emit(building_id)
+
+func _on_building_construction_result(building_id: String, success: bool, error: String) -> void:
+	if success:
+		return
+	push_warning("BuildingScreen: construction failed for '%s' (%s)" % [building_id, error])

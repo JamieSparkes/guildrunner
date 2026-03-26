@@ -5,6 +5,7 @@ extends Node
 # ── Time ─────────────────────────────────────────────────────────────────────
 
 signal day_advanced(day: int)
+signal morning_phase_started(day: int)
 signal night_began(day: int)
 signal week_advanced(week: int)
 
@@ -48,3 +49,20 @@ signal gold_changed(delta: int, new_total: int)
 # ── Game state ────────────────────────────────────────────────────────────────
 
 signal state_changed(from_state: int, to_state: int)  # Enums.GameState
+
+# ── Application Commands / Results ───────────────────────────────────────────
+
+## UI emits commands; AppController executes them.
+signal cmd_start_new_game()
+signal cmd_transition_state(new_state: int)
+signal cmd_open_screen(screen_id: String, data: Dictionary)
+signal cmd_close_top_screen()
+signal cmd_clear_screens()
+signal cmd_dispatch_contract(contract: ContractData, hero_ids: Array[String], commitment: int)
+signal cmd_begin_construction(building_id: String)
+signal cmd_use_intervention(mission_id: String, new_commitment: int)
+
+## Command results for UI feedback.
+signal mission_dispatch_result(success: bool, mission_id: String, error: String)
+signal building_construction_result(building_id: String, success: bool, error: String)
+signal intervention_command_result(success: bool, error: String)
