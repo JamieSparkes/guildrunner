@@ -11,6 +11,7 @@ func _ready() -> void:
 	EventBus.cmd_dispatch_contract.connect(_on_cmd_dispatch_contract)
 	EventBus.cmd_begin_construction.connect(_on_cmd_begin_construction)
 	EventBus.cmd_use_intervention.connect(_on_cmd_use_intervention)
+	EventBus.cmd_finalize_mission.connect(_on_cmd_finalize_mission)
 
 func _on_cmd_start_new_game() -> void:
 	GameManager.start_new_game()
@@ -34,7 +35,7 @@ func _on_cmd_dispatch_contract(contract: ContractData, hero_ids: Array[String], 
 		return
 	ContractQueue.remove_contract(contract.contract_id)
 	EventBus.mission_dispatch_result.emit(true, mission_id, "")
-	UIManager.clear_screens()
+	EventBus.cmd_clear_screens.emit()
 
 func _on_cmd_begin_construction(building_id: String) -> void:
 	var success := BuildingManager.begin_construction(building_id)
@@ -51,3 +52,7 @@ func _on_cmd_use_intervention(mission_id: String, new_commitment: int) -> void:
 	MissionManager.update_commitment(mission_id, new_commitment)
 	EventBus.intervention_used.emit(mission_id, new_commitment)
 	EventBus.intervention_command_result.emit(true, "")
+	# Stream resume is handled by FeedManager._on_intervention_used().
+
+func _on_cmd_finalize_mission(mission_id: String) -> void:
+	MissionManager.finalize_mission(mission_id)

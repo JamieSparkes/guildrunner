@@ -375,11 +375,12 @@ func test_mission_completes_after_duration_days() -> void:
 	HeroManager._inject_hero_for_test(hero)
 	var contract := _make_contract("c1", 1, Enums.MissionType.ELIMINATE,
 		0.6, 0.0, 0.0, 0.2, 0.2, 100, 40, 2)
-	MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
+	var mid := MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
 	assert_eq(MissionManager.get_active_missions().size(), 1, "Mission should be active")
-	# Advance 2 days to reach completion
+	# Advance 2 days to reach completion, then finalize.
 	TimeManager.advance_day()
 	TimeManager.advance_day()
+	MissionManager.finalize_mission(mid)
 	assert_eq(MissionManager.get_active_missions().size(), 0, "Mission should be resolved")
 
 func test_successful_mission_awards_gold() -> void:
@@ -389,8 +390,9 @@ func test_successful_mission_awards_gold() -> void:
 	var starting_gold := GuildManager.get_state().gold
 	var contract := _make_contract("c1", 1, Enums.MissionType.ELIMINATE,
 		0.6, 0.0, 0.0, 0.2, 0.2, 100, 40, 1)
-	MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
+	var mid := MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
 	TimeManager.advance_day()
+	MissionManager.finalize_mission(mid)
 	# Hero is either back or injured/dead; gold should have changed
 	var final_gold := GuildManager.get_state().gold
 	# With a strong hero on difficulty 1, we expect gold or partial gold

@@ -76,10 +76,17 @@ var _color_index: int = 0              # Cycles through palette (shared by missi
 
 var _day_buffer: Array = []   # FeedEvents generated during the current day advance
 
+# ── Stream queue (live feed) ──────────────────────────────────────────────────
+
+var _stream_queue: Array = []     # FeedEvents waiting to be revealed by FeedScreen
+var _streaming_active: bool = false
+var _stream_paused: bool = false
+
 func _ready() -> void:
 	_templates = DataLoader.load_feed_event_templates()
 	EventBus.feed_event.connect(_on_feed_event)
 	EventBus.intervention_used.connect(_on_intervention_used)
+	EventBus.intervention_dismissed.connect(_on_intervention_dismissed)
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -94,11 +101,13 @@ func push_event(mission_id: String, event_key: String, params: Dictionary) -> vo
 	var text := _format_event(event_key, params, personality)
 	var event_color := _resolve_event_color(mission_id, event_key, params)
 	var event := FeedEvent.new(mission_id, text, event_key, false, TimeManager.current_day, event_color)
+	# Flag events that can trigger interventions; checked by FeedScreen at reveal time.
+	event.can_trigger_intervention = event_key in INTERVENTION_TRIGGER_KEYS
 	(active_feeds[mission_id] as Array).append(event)
 	_day_buffer.append(event)
-	# Check whether this event should trigger an intervention prompt.
-	if _should_trigger_intervention(mission_id, event_key):
-		EventBus.feed_intervention_available.emit(mission_id)
+	if _streaming_active:
+		_stream_queue.append(event)
+		EventBus.feed_stream_event_queued.emit()
 
 ## All events for a mission, oldest first. Returns [] if mission not known.
 func get_feed(mission_id: String) -> Array:
@@ -139,6 +148,32 @@ func get_hero_color(hero_id: String) -> Color:
 		_color_index += 1
 	return _hero_colors[hero_id]
 
+# ── Stream queue API ─────────────────────────────────────────────────────────
+
+## Open the stream queue for the upcoming day advance. Call before advance_day().
+func begin_stream() -> void:
+	_stream_queue.clear()
+	_streaming_active = true
+	_stream_paused = false
+
+## Close the stream. Called when FeedScreen is done.
+func end_stream() -> void:
+	_streaming_active = false
+
+func has_stream_events() -> bool:
+	return not _stream_queue.is_empty()
+
+func pop_stream_event() -> FeedEvent:
+	if _stream_queue.is_empty():
+		return null
+	return _stream_queue.pop_front()
+
+func is_stream_paused() -> bool:
+	return _stream_paused
+
+func set_stream_paused(paused: bool) -> void:
+	_stream_paused = paused
+
 # ── Day buffer API ───────────────────────────────────────────────────────────
 
 ## Events generated during the current day advance, in emit order.
@@ -155,18 +190,15 @@ func has_day_events() -> bool:
 
 # ── Intervention logic ────────────────────────────────────────────────────────
 
-func _should_trigger_intervention(mission_id: String, event_key: String) -> bool:
-	if _pending_interventions.get(mission_id, false):
-		return false  # Already pending for this mission
-	if GuildManager.get_state().intervention_tokens <= 0:
-		return false  # No tokens available
-	if event_key in INTERVENTION_TRIGGER_KEYS:
-		_pending_interventions[mission_id] = true
-		return true
-	return false
-
 func _on_intervention_used(mission_id: String, _commitment: int) -> void:
 	_pending_interventions.erase(mission_id)
+	set_stream_paused(false)
+	EventBus.feed_stream_resume.emit()
+
+func _on_intervention_dismissed(mission_id: String) -> void:
+	_pending_interventions.erase(mission_id)
+	set_stream_paused(false)
+	EventBus.feed_stream_resume.emit()
 
 # ── Color resolution ─────────────────────────────────────────────────────────
 
@@ -214,6 +246,9 @@ func reset_runtime_state() -> void:
 	_hero_colors.clear()
 	_color_index = 0
 	_day_buffer.clear()
+	_stream_queue.clear()
+	_streaming_active = false
+	_stream_paused = false
 
 func _reset_for_test() -> void:
 	reset_runtime_state()

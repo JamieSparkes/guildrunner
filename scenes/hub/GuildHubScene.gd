@@ -82,8 +82,7 @@ func _build_scene() -> void:
 	for building_id: String in building_labels.keys():
 		var btn := Button.new()
 		btn.text = building_labels[building_id]
-		var captured_id := building_id
-		btn.pressed.connect(func() -> void: EventBus.cmd_open_screen.emit("building", {}))
+		btn.pressed.connect(func() -> void: EventBus.cmd_open_screen.emit("building", {"building_id": building_id}))
 		hub_panel.add_child(btn)
 
 	hub_panel.add_child(HSeparator.new())

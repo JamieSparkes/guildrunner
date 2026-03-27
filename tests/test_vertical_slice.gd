@@ -117,11 +117,12 @@ func test_mission_not_resolved_before_completion_day() -> void:
 func test_mission_resolves_on_completion_day() -> void:
 	HeroManager._inject_hero_for_test(_make_hero("h1"))
 	# duration=2, start_day=1 → completion_day=3
-	MissionManager.dispatch_heroes(
+	var mid := MissionManager.dispatch_heroes(
 		_make_contract("c1", 1, 2), ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT
 	)
 
 	MissionManager._on_day_advanced(3)
+	MissionManager.finalize_mission(mid)
 
 	assert_eq(MissionManager.get_active_missions().size(), 0,
 			"No active missions after completion day")
@@ -136,8 +137,9 @@ func test_gold_changes_after_resolution() -> void:
 	contract.reward_gold_partial = 40
 	var gold_before: int = GuildManager.get_state().gold
 
-	MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
+	var mid := MissionManager.dispatch_heroes(contract, ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT)
 	MissionManager._on_day_advanced(3)
+	MissionManager.finalize_mission(mid)
 
 	var gold_after: int = GuildManager.get_state().gold
 	# On any non-failure result, gold increases. On failure it stays the same.
@@ -146,12 +148,13 @@ func test_gold_changes_after_resolution() -> void:
 
 func test_resolution_clears_mission_from_active() -> void:
 	HeroManager._inject_hero_for_test(_make_hero("h1"))
-	MissionManager.dispatch_heroes(
+	var mid := MissionManager.dispatch_heroes(
 		_make_contract("c1", 1, 1), ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT
 	)
 	assert_eq(MissionManager.get_active_missions().size(), 1)
 
 	MissionManager._on_day_advanced(2)
+	MissionManager.finalize_mission(mid)
 
 	assert_eq(MissionManager.get_active_missions().size(), 0,
 			"Mission removed from active after resolution")
@@ -163,7 +166,7 @@ func test_two_missions_resolve_independently() -> void:
 	HeroManager._inject_hero_for_test(_make_hero("h2"))
 
 	# h1: completes on day 3; h2: completes on day 5
-	MissionManager.dispatch_heroes(
+	var mid1 := MissionManager.dispatch_heroes(
 		_make_contract("c1", 1, 2), ["h1"], Enums.CommitmentLevel.USE_JUDGEMENT
 	)
 	MissionManager.dispatch_heroes(
@@ -172,6 +175,7 @@ func test_two_missions_resolve_independently() -> void:
 	assert_eq(MissionManager.get_active_missions().size(), 2)
 
 	MissionManager._on_day_advanced(3)
+	MissionManager.finalize_mission(mid1)
 	assert_eq(MissionManager.get_active_missions().size(), 1,
 			"Only h1 mission resolves on day 3")
 	assert_ne(HeroManager.get_hero("h1").status, Enums.HeroStatus.ON_MISSION,
@@ -179,7 +183,10 @@ func test_two_missions_resolve_independently() -> void:
 	assert_eq(HeroManager.get_hero("h2").status, Enums.HeroStatus.ON_MISSION,
 			"h2 still on mission")
 
+	var mid2_arr := MissionManager.get_active_missions()
+	var mid2: String = mid2_arr[0].mission_id
 	MissionManager._on_day_advanced(5)
+	MissionManager.finalize_mission(mid2)
 	assert_eq(MissionManager.get_active_missions().size(), 0,
 			"Both missions resolved")
 

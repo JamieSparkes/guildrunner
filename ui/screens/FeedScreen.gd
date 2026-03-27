@@ -1,14 +1,27 @@
 extends Control
-## Single-column mission feed (M9b). Color-coded by mission; batched on day advance.
-## Auto-opened after "Advance Day" if events were generated. Manual open shows full history.
+## Single-column mission feed. Events are revealed one-by-one via a timer.
+## Pauses on intervention triggers; resumes after the player resolves the prompt.
+## Auto-opened after "Advance Day". Manual open shows full history (non-streaming).
 
 const FEED_ENTRY_SCENE := preload("res://ui/components/FeedEntry.tscn")
 const INTERVENTION_PROMPT_SCENE := preload("res://ui/components/InterventionPrompt.tscn")
 
+const REVEAL_DELAY_SEC: float = 0.8
+
 var _scroll: ScrollContainer
 var _entries_box: VBoxContainer
 var _empty_lbl: Label
+var _close_btn: Button
 var _auto_opened: bool = false
+
+# ── Stream state ──────────────────────────────────────────────────────────────
+
+var _timer: Timer
+## Mission IDs whose pre-outcome events have been revealed; awaiting finalization.
+var _missions_awaiting_finalization: Array[String] = []
+var _paused_for_intervention: bool = false
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
 
 func setup(data: Dictionary) -> void:
 	_auto_opened = data.get("auto_opened", false)
@@ -16,11 +29,39 @@ func setup(data: Dictionary) -> void:
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
-	_populate_feed()
-	EventBus.feed_intervention_available.connect(_on_intervention_available)
+
+	if _auto_opened:
+		# Populate finalization queue from missions that already started their narrative
+		# during advance_day() — that happens before this screen opens, so the signal
+		# mission_narrative_started was emitted before we connected to it.
+		_missions_awaiting_finalization.assign(MissionManager.get_pending_resolution_ids())
+		# Still connect for any future narrative starts (e.g. second advance while feed is open).
+		EventBus.mission_narrative_started.connect(_on_mission_narrative_started)
+		EventBus.intervention_data_ready.connect(_on_intervention_data_ready)
+		EventBus.feed_stream_resume.connect(_on_stream_resumed)
+		EventBus.feed_stream_event_queued.connect(_schedule_tick)
+		_empty_lbl.hide()
+		_scroll.show()
+		_close_btn.disabled = true
+		_schedule_tick()
+	else:
+		# Manual open: show full history all at once (non-streaming).
+		_populate_history()
+
+func _exit_tree() -> void:
+	if EventBus.mission_narrative_started.is_connected(_on_mission_narrative_started):
+		EventBus.mission_narrative_started.disconnect(_on_mission_narrative_started)
+	if EventBus.intervention_data_ready.is_connected(_on_intervention_data_ready):
+		EventBus.intervention_data_ready.disconnect(_on_intervention_data_ready)
+	if EventBus.feed_stream_resume.is_connected(_on_stream_resumed):
+		EventBus.feed_stream_resume.disconnect(_on_stream_resumed)
+	if EventBus.feed_stream_event_queued.is_connected(_schedule_tick):
+		EventBus.feed_stream_event_queued.disconnect(_schedule_tick)
+	FeedManager.end_stream()
+
+# ── UI construction ───────────────────────────────────────────────────────────
 
 func _build_ui() -> void:
-	# Backdrop
 	var bg := ColorRect.new()
 	bg.color = Color(0.0, 0.0, 0.0, 0.65)
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -30,7 +71,6 @@ func _build_ui() -> void:
 	outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(outer)
 
-	# Header
 	var header_margin := MarginContainer.new()
 	for side: String in ["left", "right", "top", "bottom"]:
 		header_margin.add_theme_constant_override("margin_" + side, 10)
@@ -47,14 +87,13 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 
-	var close_btn := Button.new()
-	close_btn.text = "Close"
-	close_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
-	header.add_child(close_btn)
+	_close_btn = Button.new()
+	_close_btn.text = "Close"
+	_close_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
+	header.add_child(_close_btn)
 
 	outer.add_child(HSeparator.new())
 
-	# Empty state label
 	_empty_lbl = Label.new()
 	_empty_lbl.text = "No mission events.\nDispatch heroes from the Contract Board."
 	_empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -64,7 +103,6 @@ func _build_ui() -> void:
 	_empty_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	outer.add_child(_empty_lbl)
 
-	# Scrollable entries
 	_scroll = ScrollContainer.new()
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -75,66 +113,85 @@ func _build_ui() -> void:
 	_entries_box.add_theme_constant_override("separation", 2)
 	_scroll.add_child(_entries_box)
 
-func _populate_feed() -> void:
-	var events: Array
-	if _auto_opened:
-		events = FeedManager.get_day_buffer()
-	else:
-		events = FeedManager.get_all_events()
+	# Create the timer used for streaming.
+	_timer = Timer.new()
+	_timer.one_shot = true
+	_timer.timeout.connect(_on_timer_tick)
+	add_child(_timer)
 
+# ── Streaming loop ────────────────────────────────────────────────────────────
+
+func _schedule_tick() -> void:
+	if _paused_for_intervention or _timer.time_left > 0:
+		return
+	_timer.start(REVEAL_DELAY_SEC)
+
+func _on_timer_tick() -> void:
+	if _paused_for_intervention:
+		return
+	if not FeedManager.has_stream_events():
+		_try_finalize_next()
+		return
+	var event: FeedEvent = FeedManager.pop_stream_event()
+	_reveal_event(event)
+	# Check for intervention trigger at reveal time — not at push time.
+	if event.can_trigger_intervention \
+			and GuildManager.get_state().intervention_tokens > 0 \
+			and not _paused_for_intervention:
+		_paused_for_intervention = true
+		FeedManager.set_stream_paused(true)
+		EventBus.cmd_request_intervention.emit(event.mission_id, event.event_key)
+		return  # Wait for intervention_data_ready, then feed_stream_resume.
+	_schedule_tick()
+
+func _reveal_event(event: FeedEvent) -> void:
+	_empty_lbl.hide()
+	_scroll.show()
+	var entry: Node = FEED_ENTRY_SCENE.instantiate()
+	entry.setup(event)
+	_entries_box.add_child(entry)
+	# Scroll to bottom after layout is updated.
+	(func() -> void:
+		_scroll.scroll_vertical = _scroll.get_v_scroll_bar().max_value
+	).call_deferred()
+
+func _try_finalize_next() -> void:
+	if _missions_awaiting_finalization.is_empty():
+		_on_all_done()
+		return
+	var mission_id: String = _missions_awaiting_finalization.pop_front()
+	# Finalization pushes outcome + epilogue events into the stream queue,
+	# which triggers feed_stream_event_queued → _schedule_tick().
+	EventBus.cmd_finalize_mission.emit(mission_id)
+
+func _on_all_done() -> void:
+	_close_btn.disabled = false
+
+# ── Signal handlers ───────────────────────────────────────────────────────────
+
+func _on_mission_narrative_started(mission_id: String) -> void:
+	_missions_awaiting_finalization.append(mission_id)
+
+func _on_intervention_data_ready(data: InterventionData) -> void:
+	var prompt: Node = INTERVENTION_PROMPT_SCENE.instantiate()
+	prompt.setup(data)
+	_entries_box.add_child(prompt)
+
+func _on_stream_resumed() -> void:
+	_paused_for_intervention = false
+	_schedule_tick()
+
+# ── Non-streaming history display ─────────────────────────────────────────────
+
+func _populate_history() -> void:
+	var events: Array = FeedManager.get_all_events()
 	if events.is_empty():
 		_empty_lbl.show()
 		_scroll.hide()
 		return
-
 	_empty_lbl.hide()
 	_scroll.show()
-
-	# Track last entry index per mission for intervention placement.
-	var last_entry_index: Dictionary = {}  # { mission_id: int }
-
 	for event: FeedEvent in events:
 		var entry: Node = FEED_ENTRY_SCENE.instantiate()
 		entry.setup(event)
 		_entries_box.add_child(entry)
-		last_entry_index[event.mission_id] = _entries_box.get_child_count() - 1
-
-	# Insert inline intervention prompts after the triggering event.
-	# Process in reverse index order so insertions don't shift earlier indices.
-	var interventions: Array = _collect_pending_interventions(events)
-	interventions.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return a["index"] > b["index"]
-	)
-	for info: Dictionary in interventions:
-		var prompt: Node = INTERVENTION_PROMPT_SCENE.instantiate()
-		prompt.setup(info["mission_id"], info["context"])
-		_entries_box.add_child(prompt)
-		_entries_box.move_child(prompt, info["index"] + 1)
-
-## Build list of {mission_id, index, context} for pending interventions.
-func _collect_pending_interventions(events: Array) -> Array:
-	var result: Array = []
-	var seen_missions: Dictionary = {}
-	for i: int in events.size():
-		var event: FeedEvent = events[i]
-		if event.event_key in FeedManager.INTERVENTION_TRIGGER_KEYS \
-				and not seen_missions.has(event.mission_id) \
-				and FeedManager._pending_interventions.get(event.mission_id, false):
-			seen_missions[event.mission_id] = true
-			var context := _intervention_context(event.event_key)
-			result.append({"mission_id": event.mission_id, "index": i, "context": context})
-	return result
-
-func _intervention_context(event_key: String) -> String:
-	if event_key in ["hero_wounded_minor", "hero_wounded_serious"]:
-		return "A hero has been wounded. Change commitment?"
-	if event_key == "encounter_obstacle":
-		return "A decision point reached. Change commitment?"
-	return "Intervention available. Change commitment?"
-
-func _on_intervention_available(mission_id: String) -> void:
-	# Live trigger (unlikely with batching, but defensive).
-	var context := "Intervention available. Change commitment?"
-	var prompt: Node = INTERVENTION_PROMPT_SCENE.instantiate()
-	prompt.setup(mission_id, context)
-	_entries_box.add_child(prompt)

@@ -1,7 +1,7 @@
 extends GutTest
 ## Tests for M9: Multi-Column Feed + Interventions.
-## Covers: token deduction/reset, commitment update, intervention signal triggers,
-## no-trigger-without-tokens, no double-trigger, 6 independent feeds.
+## Covers: token deduction/reset, commitment update, can_trigger_intervention flag,
+## stream resume on intervention_used/dismissed, 6 independent feeds.
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -38,12 +38,14 @@ func _make_contract(id: String, duration: int = 3) -> ContractData:
 	return c
 
 ## Push a trigger event directly through FeedManager.
-func _push_trigger(mission_id: String, event_key: String) -> void:
+func _push_trigger(mission_id: String, event_key: String) -> FeedEvent:
 	FeedManager.push_event(mission_id, event_key, {
 		"personality": "STOIC",
 		"name": "Test Hero",
 		"target": "Somewhere",
 	})
+	var feed: Array = FeedManager.get_feed(mission_id)
+	return feed[feed.size() - 1]
 
 func before_each() -> void:
 	HeroManager._clear_roster_for_test()
@@ -125,86 +127,86 @@ func test_update_commitment_noop_for_unknown_mission() -> void:
 	MissionManager.update_commitment("nonexistent_id", Enums.CommitmentLevel.AT_ANY_COST)
 	pass_test("No crash on unknown mission_id")
 
-# ── Intervention signal triggers ──────────────────────────────────────────────
+# ── can_trigger_intervention flag ─────────────────────────────────────────────
 
-func test_trigger_key_emits_intervention_signal_when_tokens_available() -> void:
-	GuildManager.set_max_intervention_tokens(1)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_minor")
-	assert_signal_emitted_with_parameters(
-		EventBus, "feed_intervention_available", ["m1"]
-	)
+func test_trigger_key_sets_can_trigger_intervention_flag() -> void:
+	var event := _push_trigger("m1", "hero_wounded_minor")
+	assert_true(event.can_trigger_intervention,
+		"hero_wounded_minor should set can_trigger_intervention")
 
-func test_encounter_obstacle_triggers_intervention() -> void:
-	GuildManager.set_max_intervention_tokens(1)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "encounter_obstacle")
-	assert_signal_emitted_with_parameters(
-		EventBus, "feed_intervention_available", ["m1"]
-	)
+func test_encounter_obstacle_sets_flag() -> void:
+	var event := _push_trigger("m1", "encounter_obstacle")
+	assert_true(event.can_trigger_intervention,
+		"encounter_obstacle should set can_trigger_intervention")
 
-func test_hero_wounded_serious_triggers_intervention() -> void:
-	GuildManager.set_max_intervention_tokens(1)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_serious")
-	assert_signal_emitted_with_parameters(
-		EventBus, "feed_intervention_available", ["m1"]
-	)
+func test_hero_wounded_serious_sets_flag() -> void:
+	var event := _push_trigger("m1", "hero_wounded_serious")
+	assert_true(event.can_trigger_intervention,
+		"hero_wounded_serious should set can_trigger_intervention")
 
-func test_non_trigger_key_does_not_emit_signal() -> void:
-	GuildManager.set_max_intervention_tokens(1)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "travel_uneventful")
-	assert_signal_not_emitted(EventBus, "feed_intervention_available")
+func test_non_trigger_key_does_not_set_flag() -> void:
+	var event := _push_trigger("m1", "travel_uneventful")
+	assert_false(event.can_trigger_intervention,
+		"travel_uneventful should not set can_trigger_intervention")
 
-func test_no_trigger_when_tokens_zero() -> void:
-	GuildManager.set_max_intervention_tokens(0)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_minor")
-	assert_signal_not_emitted(EventBus, "feed_intervention_available")
+func test_arrival_does_not_set_flag() -> void:
+	var event := _push_trigger("m1", "arrival")
+	assert_false(event.can_trigger_intervention,
+		"arrival should not set can_trigger_intervention")
 
-# ── No double-trigger ─────────────────────────────────────────────────────────
+# ── Stream resume on intervention resolved ────────────────────────────────────
 
-func test_second_trigger_key_does_not_emit_again_for_same_mission() -> void:
-	GuildManager.set_max_intervention_tokens(2)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_minor")
-	_push_trigger("m1", "encounter_obstacle")
-	# Signal should have fired exactly once for m1.
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 1)
-
-func test_intervention_used_clears_pending_and_allows_next_trigger() -> void:
-	GuildManager.set_max_intervention_tokens(2)
-	GuildManager.reset_intervention_tokens()
-	# First trigger.
-	_push_trigger("m1", "hero_wounded_minor")
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 1)
-	# Simulate the player using the intervention — clears the pending flag.
+func test_intervention_used_emits_feed_stream_resume() -> void:
 	EventBus.intervention_used.emit("m1", Enums.CommitmentLevel.COME_HOME_SAFE)
-	# Spend a token manually to match real flow.
-	GuildManager.spend_intervention_token()
-	# Second trigger on same mission should now fire again.
-	_push_trigger("m1", "encounter_obstacle")
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 2)
+	assert_signal_emitted(EventBus, "feed_stream_resume",
+		"feed_stream_resume should fire after intervention_used")
 
-func test_pending_flag_cleared_by_clear_feed() -> void:
-	GuildManager.set_max_intervention_tokens(2)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_minor")
-	FeedManager.clear_feed("m1")
-	# After clear, re-triggering should work (pending flag gone).
-	_push_trigger("m1", "hero_wounded_serious")
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 2)
+func test_intervention_dismissed_emits_feed_stream_resume() -> void:
+	EventBus.intervention_dismissed.emit("m1")
+	assert_signal_emitted(EventBus, "feed_stream_resume",
+		"feed_stream_resume should fire after intervention_dismissed")
+
+func test_intervention_used_clears_stream_paused_state() -> void:
+	FeedManager.begin_stream()
+	FeedManager.set_stream_paused(true)
+	EventBus.intervention_used.emit("m1", Enums.CommitmentLevel.COME_HOME_SAFE)
+	assert_false(FeedManager.is_stream_paused(), "Stream should not be paused after intervention_used")
+
+func test_intervention_dismissed_clears_stream_paused_state() -> void:
+	FeedManager.begin_stream()
+	FeedManager.set_stream_paused(true)
+	EventBus.intervention_dismissed.emit("m1")
+	assert_false(FeedManager.is_stream_paused(), "Stream should not be paused after dismissal")
+
+# ── Stream queue ──────────────────────────────────────────────────────────────
+
+func test_begin_stream_enables_queue() -> void:
+	FeedManager.begin_stream()
+	_push_trigger("m1", "travel_uneventful")
+	assert_true(FeedManager.has_stream_events(), "Stream queue should have events after begin_stream")
+
+func test_events_not_queued_before_begin_stream() -> void:
+	# _streaming_active is false by default after reset.
+	_push_trigger("m1", "travel_uneventful")
+	assert_false(FeedManager.has_stream_events(), "Events should not queue before begin_stream")
+
+func test_pop_stream_event_returns_in_order() -> void:
+	FeedManager.begin_stream()
+	_push_trigger("m1", "travel_uneventful")
+	_push_trigger("m1", "arrival")
+	var first: FeedEvent = FeedManager.pop_stream_event()
+	assert_eq(first.event_key, "travel_uneventful", "First event should be travel_uneventful")
+	var second: FeedEvent = FeedManager.pop_stream_event()
+	assert_eq(second.event_key, "arrival", "Second event should be arrival")
+	assert_false(FeedManager.has_stream_events(), "Queue empty after both events popped")
+
+func test_feed_stream_event_queued_signal_emitted() -> void:
+	FeedManager.begin_stream()
+	_push_trigger("m1", "travel_uneventful")
+	assert_signal_emitted(EventBus, "feed_stream_event_queued",
+		"feed_stream_event_queued should fire when event pushed during stream")
 
 # ── Independent feeds ─────────────────────────────────────────────────────────
-
-func test_trigger_on_mission_a_does_not_affect_mission_b() -> void:
-	GuildManager.set_max_intervention_tokens(3)
-	GuildManager.reset_intervention_tokens()
-	_push_trigger("m1", "hero_wounded_minor")
-	# m2 should still be able to trigger independently.
-	_push_trigger("m2", "hero_wounded_minor")
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 2)
 
 func test_six_independent_feeds_all_accumulate_events() -> void:
 	# Simulate 6 concurrent missions, each receiving 3 events.
@@ -218,13 +220,6 @@ func test_six_independent_feeds_all_accumulate_events() -> void:
 		var mid := "m%d" % i
 		var feed: Array = FeedManager.get_feed(mid)
 		assert_eq(feed.size(), 3, "%s has 3 events" % mid)
-
-func test_six_independent_feeds_trigger_independently() -> void:
-	GuildManager.set_max_intervention_tokens(6)
-	GuildManager.reset_intervention_tokens()
-	for i: int in range(1, 7):
-		_push_trigger("m%d" % i, "hero_wounded_minor")
-	assert_signal_emit_count(EventBus, "feed_intervention_available", 6)
 
 func test_get_all_events_returns_events_across_all_missions() -> void:
 	for i: int in range(1, 4):

@@ -35,7 +35,7 @@ func test_event_bus_has_contract_signals() -> void:
 
 func test_event_bus_has_feed_signals() -> void:
 	assert_true(EventBus.has_signal("feed_event"),                    "feed_event missing")
-	assert_true(EventBus.has_signal("feed_intervention_available"),   "feed_intervention_available missing")
+	assert_true(EventBus.has_signal("intervention_data_ready"),   "intervention_data_ready missing")
 	assert_true(EventBus.has_signal("intervention_used"),             "intervention_used missing")
 
 func test_event_bus_has_faction_signals() -> void:

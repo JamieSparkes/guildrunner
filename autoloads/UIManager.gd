@@ -31,9 +31,9 @@ func push_screen(screen_id: String, data: Dictionary = {}) -> void:
 		push_error("UIManager: could not load scene for '%s'" % screen_id)
 		return
 	var instance: Node = packed.instantiate()
-	_layer.add_child(instance)
 	if instance.has_method("setup"):
 		instance.setup(data)
+	_layer.add_child(instance)
 	_stack.append(instance)
 
 ## Pop and free the top screen.

@@ -86,6 +86,9 @@ func _on_enter_state(state: Enums.GameState) -> void:
 	match state:
 		Enums.GameState.MORNING_PHASE:
 			FeedManager.clear_day_buffer()
+			# Open the stream queue before advance_day() so events are captured
+			# as they are emitted synchronously during mission narrative generation.
+			FeedManager.begin_stream()
 			TimeManager.advance_day()
 			# Morning processing is synchronous; return to hub on the next frame
 			# so all day_advanced listeners finish before the state changes again.
@@ -99,4 +102,7 @@ func _finish_morning_phase() -> void:
 		call_deferred("_auto_open_feed")
 
 func _auto_open_feed() -> void:
-	EventBus.cmd_open_screen.emit("feed", {"auto_opened": true})
+	EventBus.cmd_open_screen.emit("feed", {
+		"auto_opened": true,
+		"pending_missions": MissionManager.get_pending_resolution_count(),
+	})

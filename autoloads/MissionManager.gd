@@ -12,15 +12,23 @@ class ActiveMission:
 	var start_day: int = 0
 	var completion_day: int = 0
 
+## Holds the squad reference for a mission between narrative generation and outcome
+## finalization. Created in _begin_mission_narrative(), consumed in finalize_mission().
+class PendingResolution:
+	var mission: ActiveMission = null
+	var squad: Array = []   # Array[HeroData]
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _active: Dictionary = {}    # { mission_id: ActiveMission }
+var _active: Dictionary = {}                # { mission_id: ActiveMission }
+var _pending_resolutions: Dictionary = {}   # { mission_id: PendingResolution }
 var _counter: int = 0
 var _item_db: Dictionary = {}   # Populated on _ready
 
 func _ready() -> void:
 	_item_db = DataLoader.load_item_definitions()
 	EventBus.day_advanced.connect(_on_day_advanced)
+	EventBus.cmd_request_intervention.connect(_on_cmd_request_intervention)
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -81,17 +89,33 @@ func get_mission_title(mission_id: String) -> String:
 		return mission_id
 	return mission.contract.title
 
+## Number of missions with pre-outcome events queued but not yet finalized.
+func get_pending_resolution_count() -> int:
+	return _pending_resolutions.size()
+
+## IDs of missions that have generated pre-outcome events but not yet been finalized.
+## FeedScreen calls this at open-time to populate its finalization queue.
+func get_pending_resolution_ids() -> Array[String]:
+	var ids: Array[String] = []
+	ids.assign(_pending_resolutions.keys())
+	return ids
+
 # ── Day tick ──────────────────────────────────────────────────────────────────
 
 func _on_day_advanced(day: int) -> void:
 	for mission: ActiveMission in _active.values().duplicate():
+		# Skip if narrative already started but not yet finalized.
+		if _pending_resolutions.has(mission.mission_id):
+			continue
 		if day >= mission.completion_day:
-			_resolve_mission(mission)
+			_begin_mission_narrative(mission)
 
 # ── Resolution ────────────────────────────────────────────────────────────────
 
-func _resolve_mission(mission: ActiveMission) -> void:
-	var contract := mission.contract
+## Phase 1: Generate pre-outcome narrative events (travel, arrival, encounters).
+## Stores a PendingResolution so finalize_mission() can complete the mission later.
+## Emits mission_narrative_started so FeedScreen knows to queue this for finalization.
+func _begin_mission_narrative(mission: ActiveMission) -> void:
 	var squad: Array[HeroData] = []
 	for id: String in mission.hero_ids:
 		var hero := HeroManager.get_hero(id)
@@ -102,19 +126,41 @@ func _resolve_mission(mission: ActiveMission) -> void:
 		_active.erase(mission.mission_id)
 		return
 
+	var pending := PendingResolution.new()
+	pending.mission = mission
+	pending.squad = squad
+	_pending_resolutions[mission.mission_id] = pending
+
+	_emit_pre_outcome_events(mission, squad)
+	EventBus.mission_narrative_started.emit(mission.mission_id)
+
+## Phase 2: Compute outcome using current commitment, emit outcome + epilogue events,
+## apply all state changes. Called by AppController via cmd_finalize_mission.
+## Idempotent: safe to call twice — second call is a no-op (pending already erased).
+func finalize_mission(mission_id: String) -> void:
+	var pending: PendingResolution = _pending_resolutions.get(mission_id, null)
+	if pending == null:
+		return
+	_pending_resolutions.erase(mission_id)
+
+	var mission := pending.mission
+	var squad: Array[HeroData] = []
+	for h in pending.squad:
+		squad.append(h as HeroData)
+	var contract := mission.contract
+
+	# Outcome uses the commitment at finalization time, so any intervention
+	# commitment changes made during the feed window take effect here.
 	var result := MissionResolver.resolve_mission(contract, squad, mission.commitment, _item_db)
 
-	# Pre-compute per-hero outcomes so we can emit narrative before applying state.
 	var outcomes: Array = []
 	for hero: HeroData in squad:
 		outcomes.append(InjuryResolver.resolve_hero_outcome(
 			hero, result, mission.commitment, contract.difficulty
 		))
 
-	# Emit full narrative feed sequence.
-	_emit_mission_narrative(mission, squad, result, outcomes)
+	_emit_outcome_events(mission, squad, result, outcomes)
 
-	# Apply gold reward.
 	match result:
 		Enums.MissionResult.FULL_SUCCESS, Enums.MissionResult.SUCCESS:
 			GuildManager.add_gold(contract.reward_gold)
@@ -123,24 +169,17 @@ func _resolve_mission(mission: ActiveMission) -> void:
 
 	_apply_rep(contract, result)
 
-	# Apply per-hero outcomes and update history.
 	for i: int in squad.size():
-		_apply_hero_outcome(squad[i], outcomes[i], result, contract, mission.mission_id)
+		_apply_hero_outcome(squad[i], outcomes[i], result, contract, mission_id)
 
 	EventBus.contract_completed.emit(
 		contract.contract_id, result != Enums.MissionResult.FAILURE
 	)
-	_active.erase(mission.mission_id)
+	_active.erase(mission_id)
 
-func _emit_mission_narrative(
-	mission: ActiveMission,
-	squad: Array[HeroData],
-	result: Enums.MissionResult,
-	outcomes: Array
-) -> void:
+func _emit_pre_outcome_events(mission: ActiveMission, squad: Array[HeroData]) -> void:
 	var mid := mission.mission_id
 	var target := mission.contract.title
-	# Use the lead hero's personality for shared events.
 	var lead: HeroData = squad[0]
 	var base_params := {
 		"name":        lead.display_name,
@@ -161,6 +200,21 @@ func _emit_mission_narrative(
 			encounter_pool[randi() % encounter_pool.size()],
 			base_params
 		)
+
+func _emit_outcome_events(
+	mission: ActiveMission,
+	squad: Array[HeroData],
+	result: Enums.MissionResult,
+	outcomes: Array
+) -> void:
+	var mid := mission.mission_id
+	var target := mission.contract.title
+	var lead: HeroData = squad[0]
+	var base_params := {
+		"name":        lead.display_name,
+		"personality": _personality_key(lead),
+		"target":      target,
+	}
 
 	var outcome_key := ""
 	match result:
@@ -191,6 +245,33 @@ func _emit_mission_narrative(
 			EventBus.feed_event.emit(mid, wkey, hparams)
 		else:
 			EventBus.feed_event.emit(mid, "hero_returned", hparams)
+
+# ── Intervention handling ─────────────────────────────────────────────────────
+
+func _on_cmd_request_intervention(mission_id: String, event_key: String) -> void:
+	var mission: ActiveMission = _active.get(mission_id, null)
+	if mission == null:
+		return
+	var data := InterventionData.new()
+	data.mission_id = mission_id
+	data.intervention_type = InterventionData.Type.COMMITMENT_CHANGE
+	data.context_text = _intervention_context_for_key(event_key)
+	data.trigger_event_key = event_key
+	data.options = [
+		Enums.CommitmentLevel.AT_ANY_COST,
+		Enums.CommitmentLevel.USE_JUDGEMENT,
+		Enums.CommitmentLevel.COME_HOME_SAFE,
+	]
+	data.current_option_index = mission.commitment
+	EventBus.intervention_data_ready.emit(data)
+
+func _intervention_context_for_key(event_key: String) -> String:
+	match event_key:
+		"hero_wounded_minor", "hero_wounded_serious":
+			return "A hero has been wounded. Adjust commitment?"
+		"encounter_obstacle":
+			return "The squad faces a decision point. Change commitment?"
+	return "Intervention available. Change commitment?"
 
 func _apply_hero_outcome(
 	hero: HeroData,
@@ -248,10 +329,12 @@ func _personality_key(hero: HeroData) -> String:
 
 func reset_runtime_state() -> void:
 	_active.clear()
+	_pending_resolutions.clear()
 	_counter = 0
 	_item_db = DataLoader.load_item_definitions()
 
 func _reset_for_test() -> void:
 	_active.clear()
+	_pending_resolutions.clear()
 	_counter = 0
 	_item_db = {}
