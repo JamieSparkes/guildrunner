@@ -5,6 +5,7 @@ extends Node
 # ── Time ─────────────────────────────────────────────────────────────────────
 
 signal day_advanced(day: int)
+signal morning_phase_started(day: int)
 signal night_began(day: int)
 signal week_advanced(week: int)
 
@@ -29,7 +30,6 @@ signal messenger_arrived(contract_id: String)
 # ── Feed ──────────────────────────────────────────────────────────────────────
 
 signal feed_event(mission_id: String, event_key: String, params: Dictionary)
-signal feed_intervention_available(mission_id: String)
 signal intervention_used(mission_id: String, new_commitment: int)  # Enums.CommitmentLevel
 
 # ── Factions ─────────────────────────────────────────────────────────────────
@@ -48,3 +48,58 @@ signal gold_changed(delta: int, new_total: int)
 # ── Game state ────────────────────────────────────────────────────────────────
 
 signal state_changed(from_state: int, to_state: int)  # Enums.GameState
+
+# ── Application Commands / Results ───────────────────────────────────────────
+
+## UI emits commands; AppController executes them.
+signal cmd_start_new_game()
+signal cmd_transition_state(new_state: int)
+signal cmd_open_screen(screen_id: String, data: Dictionary)
+signal cmd_close_top_screen()
+signal cmd_clear_screens()
+signal cmd_dispatch_contract(contract: ContractData, hero_ids: Array[String], commitment: int)
+signal cmd_begin_construction(building_id: String)
+signal cmd_use_intervention(mission_id: String, new_commitment: int)
+
+## Command results for UI feedback.
+signal mission_dispatch_result(success: bool, mission_id: String, error: String)
+signal building_construction_result(building_id: String, success: bool, error: String)
+signal intervention_command_result(success: bool, error: String)
+
+# ── Feed streaming ─────────────────────────────────────────────────────────────
+
+## Emitted by MissionManager when a staged mission advances to a new stage.
+## stage_index is the stage the heroes have just entered (0-based).
+signal mission_stage_advanced(mission_id: String, stage_index: int, total_stages: int)
+
+## Emitted by MissionManager when a staged mission completes (all stages or timeout).
+signal mission_stage_completed(mission_id: String, success: bool)
+
+## Emitted by MissionManager when pre-outcome events have been queued for a mission.
+## FeedScreen appends mission_id to its finalization queue.
+signal mission_narrative_started(mission_id: String)
+
+## Emitted by FeedManager.push_event() when a new event is added during an active stream.
+## FeedScreen uses this to restart its timer if it was idle.
+signal feed_stream_event_queued()
+
+## FeedScreen emits this when it has exhausted pre-outcome events for a mission.
+## AppController forwards to MissionManager.finalize_mission().
+signal cmd_finalize_mission(mission_id: String)
+
+## FeedScreen emits this when it reveals an event that can trigger an intervention
+## and the guild has tokens available. MissionManager handles this by building
+## an InterventionData object and emitting intervention_data_ready.
+signal cmd_request_intervention(mission_id: String, event_key: String)
+
+## MissionManager emits this after constructing the InterventionData.
+## FeedScreen listens to instantiate the correct prompt widget.
+signal intervention_data_ready(data: InterventionData)
+
+## Emitted by FeedManager when an intervention is resolved (token spent or dismissed).
+## FeedScreen listens to resume the stream timer.
+signal feed_stream_resume()
+
+## Emitted by InterventionPrompt dismiss button (no token spent).
+## FeedManager listens to clear the pending flag and emit feed_stream_resume.
+signal intervention_dismissed(mission_id: String)

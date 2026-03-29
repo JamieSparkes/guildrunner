@@ -93,6 +93,37 @@ static func resolve_mission_with_roll(
 static func hero_score(hero: HeroData, contract: ContractData, item_db: Dictionary = {}) -> float:
 	return _hero_score(hero, contract, item_db)
 
+## Calculate the mathematical probability (0.0 to 1.0) of getting a SUCCESS or better.
+## Useful for UI previews before dispatching.
+static func calculate_success_chance(
+	contract: ContractData,
+	squad: Array[HeroData],
+	commitment: Enums.CommitmentLevel,
+	item_db: Dictionary = {}
+) -> float:
+	if squad.is_empty():
+		return 0.0
+
+	var score := 0.0
+	for hero: HeroData in squad:
+		score += _hero_score(hero, contract, item_db)
+
+	if squad.size() > 1:
+		var leader := _highest_leadership(squad)
+		score += leader.leadership * contract.weight_leadership * 0.5
+
+	score += RelationshipModifier.get_score_modifier(squad)
+	score /= float(squad.size())
+	score *= COMMITMENT_MULTIPLIER[commitment]
+
+	var threshold := 40.0 + float(contract.difficulty - 1) * 10.0
+	
+	# roll = score + randf_range(-25.0, 25.0)
+	# We want P(roll >= threshold) = P(score + rand >= threshold)
+	# rand is uniform on [-25, 25].
+	var diff := threshold - score
+	return clamp((25.0 - diff) / 50.0, 0.0, 1.0)
+
 # ── Internal ──────────────────────────────────────────────────────────────────
 
 static func _hero_score(hero: HeroData, contract: ContractData, item_db: Dictionary) -> float:

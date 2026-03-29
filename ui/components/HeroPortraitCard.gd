@@ -11,6 +11,7 @@ var _name_lbl: Label
 var _archetype_lbl: Label
 var _status_lbl: Label
 var _toggle_btn: Button
+var _portrait: Control
 
 func setup(hero: HeroData) -> void:
 	_hero = hero
@@ -28,6 +29,12 @@ func _build_ui() -> void:
 	var vbox := VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(vbox)
+
+	_portrait = ColorRect.new()
+	_portrait.custom_minimum_size = Vector2(48, 48)
+	_portrait.color = Color(0.25, 0.20, 0.15)
+	_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	vbox.add_child(_portrait)
 
 	_name_lbl = Label.new()
 	_name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -54,6 +61,15 @@ func _build_ui() -> void:
 	vbox.add_child(view_btn)
 
 func _update_display() -> void:
+	var new_portrait := PortraitHelper.create_portrait_rect(_hero.portrait_id, 48.0)
+	new_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var vbox := _portrait.get_parent()
+	var idx := _portrait.get_index()
+	_portrait.queue_free()
+	vbox.add_child(new_portrait)
+	vbox.move_child(new_portrait, idx)
+	_portrait = new_portrait
+
 	_name_lbl.text = _hero.display_name
 	_archetype_lbl.text = Enums.HeroArchetype.keys()[_hero.archetype]
 	_status_lbl.text = Enums.HeroStatus.keys()[_hero.status]

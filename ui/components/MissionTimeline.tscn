@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ctimeline01"]
+
+[ext_resource type="Script" path="res://ui/components/MissionTimeline.gd" id="1_timeline"]
+
+[node name="MissionTimeline" type="PanelContainer"]
+script = ExtResource("1_timeline")

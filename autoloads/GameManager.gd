@@ -62,14 +62,12 @@ func can_transition_to(new_state: Enums.GameState) -> bool:
 ## Bootstrap a new game: reset all systems, load starting heroes, switch to hub.
 ## M13 will replace the _reset_for_test helpers with proper save-compatible init.
 func start_new_game() -> void:
-	TimeManager._reset_for_test()
-	GuildManager._reset_for_test()
-	MissionManager._reset_for_test()
-	ContractQueue._reset_for_test()
-	FeedManager._reset_for_test()
-	HeroManager._clear_roster_for_test()
-	for hero: HeroData in DataLoader.load_starting_heroes():
-		HeroManager._inject_hero_for_test(hero)
+	TimeManager.reset_runtime_state()
+	GuildManager.reset_runtime_state()
+	MissionManager.reset_runtime_state()
+	ContractQueue.reset_runtime_state()
+	FeedManager.reset_runtime_state()
+	HeroManager.reset_runtime_state()
 	# Bypass the normal transition table — game is bootstrapping from scratch.
 	current_state = Enums.GameState.GUILD_HUB
 	EventBus.state_changed.emit(Enums.GameState.MAIN_MENU, Enums.GameState.GUILD_HUB)
@@ -88,6 +86,9 @@ func _on_enter_state(state: Enums.GameState) -> void:
 	match state:
 		Enums.GameState.MORNING_PHASE:
 			FeedManager.clear_day_buffer()
+			# Open the stream queue before advance_day() so events are captured
+			# as they are emitted synchronously during mission narrative generation.
+			FeedManager.begin_stream()
 			TimeManager.advance_day()
 			# Morning processing is synchronous; return to hub on the next frame
 			# so all day_advanced listeners finish before the state changes again.
@@ -101,4 +102,7 @@ func _finish_morning_phase() -> void:
 		call_deferred("_auto_open_feed")
 
 func _auto_open_feed() -> void:
-	UIManager.push_screen("feed", {"auto_opened": true})
+	EventBus.cmd_open_screen.emit("feed", {
+		"auto_opened": true,
+		"pending_missions": MissionManager.get_pending_resolution_count(),
+	})

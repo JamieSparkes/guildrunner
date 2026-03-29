@@ -56,3 +56,14 @@ class_name ContractData extends Resource
 # ── Timing ────────────────────────────────────────────────────────────────────
 @export var available_from_day: int = 1
 @export var expiry_day: int = 999
+
+# ── Capture ───────────────────────────────────────────────────────────────────
+## If true, heroes can be captured on a FAILURE result. Set only on contracts
+## where an enemy faction is narratively present to take prisoners.
+@export var can_capture: bool = false
+
+# ── Staged contracts ─────────────────────────────────────────────────────
+## Ordered list of stages. Non-empty means this is a staged contract.
+var stages: Array[StageData] = []
+## Maximum days before mission auto-ends (staged contracts only).
+@export var max_duration_days: int = 0

@@ -43,4 +43,4 @@ func _build_ui() -> void:
 	vbox.add_child(quit_btn)
 
 func _on_new_game_pressed() -> void:
-	GameManager.start_new_game()
+	EventBus.cmd_start_new_game.emit()

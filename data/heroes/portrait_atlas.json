@@ -1,0 +1,9 @@
+{
+  "sprite_sheet": "res://art/portraits/EverFace1.0.png",
+  "sprite_size": 24,
+  "portraits": {
+    "hana_mira": 7,
+    "aldric_vane": 8,
+    "pip_ashford": 9
+  }
+}

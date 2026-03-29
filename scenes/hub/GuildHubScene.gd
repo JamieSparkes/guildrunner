@@ -8,7 +8,7 @@ const HUD_BAR_SCENE := preload("res://ui/HUDBar.tscn")
 func _ready() -> void:
 	_build_scene()
 	# Seed the board on game start (day 1 morning)
-	ContractQueue.on_morning_phase(TimeManager.current_day)
+	EventBus.morning_phase_started.emit(TimeManager.current_day)
 
 func _build_scene() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -82,8 +82,7 @@ func _build_scene() -> void:
 	for building_id: String in building_labels.keys():
 		var btn := Button.new()
 		btn.text = building_labels[building_id]
-		var captured_id := building_id
-		btn.pressed.connect(func() -> void: UIManager.push_screen("building"))
+		btn.pressed.connect(func() -> void: EventBus.cmd_open_screen.emit("building", {"building_id": building_id}))
 		hub_panel.add_child(btn)
 
 	hub_panel.add_child(HSeparator.new())
@@ -95,13 +94,13 @@ func _build_scene() -> void:
 	hub_panel.add_child(advance_btn)
 
 func _on_contract_board_pressed() -> void:
-	UIManager.push_screen("contract_board")
+	EventBus.cmd_open_screen.emit("contract_board", {})
 
 func _on_hero_roster_pressed() -> void:
-	UIManager.push_screen("hero_roster")
+	EventBus.cmd_open_screen.emit("hero_roster", {})
 
 func _on_mission_feed_pressed() -> void:
-	UIManager.push_screen("feed")
+	EventBus.cmd_open_screen.emit("feed", {})
 
 func _on_advance_day_pressed() -> void:
-	GameManager.transition_to(Enums.GameState.MORNING_PHASE)
+	EventBus.cmd_transition_state.emit(Enums.GameState.MORNING_PHASE)

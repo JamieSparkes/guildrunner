@@ -15,6 +15,10 @@ var event_key: String = ""
 ## Display color for this entry (mission color or reserved override).
 var color: Color = Color.WHITE
 
+## True if this event key is in the intervention trigger list.
+## FeedScreen checks this at reveal time to decide whether to pause the stream.
+var can_trigger_intervention: bool = false
+
 func _init(
 	p_mission_id: String = "",
 	p_text: String = "",

@@ -12,6 +12,7 @@ var _hero_cards: Array[Node] = []
 var _contract_title_lbl: Label
 var _contract_desc_lbl: Label
 var _hero_row: HBoxContainer
+var _success_chance_lbl: Label
 var _status_lbl: Label
 var _dispatch_btn: Button
 var _commit_row: HBoxContainer
@@ -24,6 +25,7 @@ func setup(data: Dictionary) -> void:
 
 func _ready() -> void:
 	_build_ui()
+	EventBus.mission_dispatch_result.connect(_on_mission_dispatch_result)
 	if _contract != null:
 		_populate_contract()
 		_populate_heroes()
@@ -104,12 +106,19 @@ func _build_ui() -> void:
 			if pressed:
 				_commitment = level as Enums.CommitmentLevel
 				_deselect_other_commit_buttons(btn)
+				_update_success_chance()
 			elif _commitment == level:
 				btn.button_pressed = true  # Prevent deselecting active option
 		)
 		_commit_row.add_child(btn)
 
 	vbox.add_child(HSeparator.new())
+
+	# Success Chance Label
+	_success_chance_lbl = Label.new()
+	_success_chance_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_success_chance_lbl.text = "Chance of Success: 0%"
+	vbox.add_child(_success_chance_lbl)
 
 	# Status / error label
 	_status_lbl = Label.new()
@@ -125,7 +134,7 @@ func _build_ui() -> void:
 	var back_btn := Button.new()
 	back_btn.text = "Back"
 	back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	back_btn.pressed.connect(UIManager.pop_screen)
+	back_btn.pressed.connect(func() -> void: EventBus.cmd_close_top_screen.emit())
 	btn_row.add_child(back_btn)
 
 	_dispatch_btn = Button.new()
@@ -153,14 +162,38 @@ func _populate_heroes() -> void:
 	for hero: HeroData in available:
 		var card := HERO_CARD_SCENE.instantiate()
 		card.setup(hero)
-		card.hero_toggled.connect(func(_h: HeroData, _p: bool) -> void: _status_lbl.text = "")
+		card.hero_toggled.connect(func(_h: HeroData, _p: bool) -> void:
+			_status_lbl.text = ""
+			_update_success_chance()
+		)
 		_hero_row.add_child(card)
 		_hero_cards.append(card)
+
+	_update_success_chance()
 
 func _deselect_other_commit_buttons(active: Button) -> void:
 	for child in _commit_row.get_children():
 		if child is Button and child != active:
 			(child as Button).button_pressed = false
+
+func _update_success_chance() -> void:
+	if not is_instance_valid(_success_chance_lbl):
+		return
+	var selected_squad: Array[HeroData] = []
+	for card in _hero_cards:
+		if card.is_selected():
+			selected_squad.append(card._hero)
+	
+	if selected_squad.is_empty():
+		_success_chance_lbl.text = "Chance of Success: —"
+		return
+
+	var chance: float
+	if not _contract.stages.is_empty():
+		chance = StageResolver.calculate_success_chance(_contract, selected_squad)
+	else:
+		chance = MissionResolver.calculate_success_chance(_contract, selected_squad, _commitment)
+	_success_chance_lbl.text = "Chance of Success: %d%%" % roundi(chance * 100)
 
 func _on_dispatch_pressed() -> void:
 	var selected_ids: Array[String] = []
@@ -176,10 +209,10 @@ func _on_dispatch_pressed() -> void:
 		_status_lbl.text = "This contract requires at least %d hero(es)." % _contract.min_heroes
 		return
 
-	var mission_id := MissionManager.dispatch_heroes(_contract, selected_ids, _commitment)
-	if mission_id.is_empty():
-		_status_lbl.text = "Dispatch failed. Check hero availability."
-		return
+	EventBus.cmd_dispatch_contract.emit(_contract, selected_ids, _commitment)
 
-	ContractQueue.remove_contract(_contract.contract_id)
-	UIManager.clear_screens()
+func _on_mission_dispatch_result(success: bool, _mission_id: String, error: String) -> void:
+	if success:
+		_status_lbl.text = ""
+		return
+	_status_lbl.text = error

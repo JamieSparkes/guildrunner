@@ -30,6 +30,7 @@ BuildingManager="*res://autoloads/BuildingManager.gd"
 FeedManager="*res://autoloads/FeedManager.gd"
 ContractQueue="*res://autoloads/ContractQueue.gd"
 UIManager="*res://autoloads/UIManager.gd"
+AppController="*res://autoloads/AppController.gd"
 
 [display]
 

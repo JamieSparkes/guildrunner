@@ -124,7 +124,36 @@ static func _contract_from_dict(entry: Dictionary) -> ContractData:
 	cd.consequence_on_failure = entry.get("consequence_on_failure", "")
 	cd.available_from_day   = entry.get("available_from_day", 1)
 	cd.expiry_day           = entry.get("expiry_day", 999)
+	cd.can_capture          = entry.get("can_capture", false)
+	cd.max_duration_days    = entry.get("max_duration_days", 0)
+	for stage_dict: Dictionary in entry.get("stages", []):
+		cd.stages.append(_stage_from_dict(stage_dict))
 	return cd
+
+static func _stage_from_dict(entry: Dictionary) -> StageData:
+	var sd := StageData.new()
+	sd.stage_id      = entry.get("stage_id", "")
+	sd.narrative_key = entry.get("narrative_key", "")
+	sd.advance       = entry.get("advance", {"type": "auto"})
+	sd.sets_flag     = entry.get("sets_flag", "")
+	for event_dict: Dictionary in entry.get("events", []):
+		sd.events.append(_stage_event_from_dict(event_dict))
+	return sd
+
+static func _stage_event_from_dict(entry: Dictionary) -> StageEventData:
+	var ed := StageEventData.new()
+	ed.event_id                  = entry.get("event_id", "")
+	ed.type                      = entry.get("type", "narrative")
+	ed.chance                    = entry.get("chance", 1.0)
+	ed.stat_modifier             = entry.get("stat_modifier", {})
+	ed.difficulty                = entry.get("difficulty", 0)
+	ed.difficulty_modifier_if_flag = entry.get("difficulty_modifier_if_flag", {})
+	ed.reward                    = entry.get("reward", {})
+	ed.narrative_key             = entry.get("narrative_key", "")
+	ed.can_trigger_intervention  = entry.get("can_trigger_intervention", false)
+	ed.on_success_flag           = entry.get("on_success_flag", "")
+	ed.on_failure_narrative_key  = entry.get("on_failure_narrative_key", "")
+	return ed
 
 # ── Item Loader ───────────────────────────────────────────────────────────────
 
