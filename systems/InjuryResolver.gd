@@ -71,11 +71,13 @@ static func roll_capture(result: Enums.MissionResult, would_have_died: bool) -> 
 ## Full resolution pipeline for one hero on a completed mission.
 ## Returns a Dictionary with keys: injured (bool), severity (InjurySeverity),
 ## died (bool), captured (bool), recovery_days (int).
+## can_capture must be true (set on the contract) for capture rolls to fire.
 static func resolve_hero_outcome(
 	hero: HeroData,
 	result: Enums.MissionResult,
 	commitment: Enums.CommitmentLevel,
-	difficulty: int
+	difficulty: int,
+	can_capture: bool = false
 ) -> Dictionary:
 	var outcome := {
 		"injured": false,
@@ -97,11 +99,11 @@ static func resolve_hero_outcome(
 		if roll_death(hero, commitment):
 			outcome["died"] = true
 			return outcome
-		# Survived a would-be death — raise capture chance
-		if roll_capture(result, true):
+		# Survived a would-be death — raise capture chance if the contract allows it.
+		if can_capture and roll_capture(result, true):
 			outcome["captured"] = true
 			return outcome
-	elif result == Enums.MissionResult.FAILURE:
+	elif can_capture and result == Enums.MissionResult.FAILURE:
 		if roll_capture(result, false):
 			outcome["captured"] = true
 

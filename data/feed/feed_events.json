@@ -144,5 +144,204 @@
     "GRIM":     ["{name} returns. Says nothing.", "Home. {name} finds a corner and sits."],
     "CAUTIOUS": ["{name} returns, every piece accounted for.", "A careful exit. {name} made it back."],
     "PROUD":    ["{name} returns with their reputation intact.", "Home again. {name} accepts the welcome with appropriate dignity."]
+  },
+
+  "stage_advance_fail": {
+    "DEFAULT": ["{name} presses on, but progress is slow.", "{name} searches but finds no way forward today."]
+  },
+  "stage_combat_victory": {
+    "DEFAULT": ["{name} fights and wins.", "{name} handles the threat."]
+  },
+  "stage_combat_struggle": {
+    "DEFAULT": ["{name} fights through, but it costs them.", "The fight is brutal. {name} survives."]
+  },
+  "stage_timed_out": {
+    "DEFAULT": ["Time runs out. {name} must turn back.", "The days run thin. {name} withdraws."]
+  },
+
+  "cave_relic_travel": {
+    "STOIC":    ["{name} makes for the cave in the northern hills."],
+    "RECKLESS": ["{name} races north, eager to find the relic."],
+    "CHEERFUL": ["{name} sets off toward the cave, whistling a tune."],
+    "GRIM":     ["{name} heads north. The cave is waiting."],
+    "CAUTIOUS": ["{name} studies the route carefully before setting out."],
+    "CYNICAL":  ["{name} heads to the cave. Expects trouble."],
+    "LOYAL":    ["{name} sets out on behalf of the guild."],
+    "PROUD":    ["{name} marches north. The Church will owe them for this."],
+    "DEFAULT":  ["{name} travels toward the relic cave."]
+  },
+  "cave_relic_find_gold": {
+    "CHEERFUL": ["A gold pouch on the road! {name} pockets it happily. (+{gold} gold)"],
+    "CYNICAL":  ["A pouch of coin on the road. {name} pockets it without comment. (+{gold} gold)"],
+    "DEFAULT":  ["{name} finds a gold pouch lying on the road. (+{gold} gold)"]
+  },
+  "cave_relic_enter": {
+    "STOIC":    ["The cave mouth looms. {name} enters without hesitation."],
+    "RECKLESS": ["{name} charges into the darkness."],
+    "GRIM":     ["The cave swallows {name} whole."],
+    "CAUTIOUS": ["{name} lights a torch and proceeds carefully into the cave."],
+    "DEFAULT":  ["{name} enters the cave."]
+  },
+  "cave_relic_search": {
+    "STOIC":    ["{name} searches the tunnels methodically."],
+    "RECKLESS": ["{name} picks a direction and runs with it."],
+    "CAUTIOUS": ["{name} marks every passage, searching thoroughly."],
+    "DEFAULT":  ["{name} searches for the relic chamber."]
+  },
+  "cave_relic_fight": {
+    "STOIC":    ["Something stirs in the dark. {name} draws steel."],
+    "RECKLESS": ["{name} charges at the creature in the tunnel!"],
+    "GRIM":     ["Movement in the shadows. {name} has been expecting this."],
+    "DEFAULT":  ["{name} is attacked in the cave!"]
+  },
+  "cave_relic_room": {
+    "STOIC":    ["{name} enters the relic chamber."],
+    "CHEERFUL": ["{name} can hardly believe it — the relic chamber!"],
+    "PROUD":    ["{name} stands in the relic chamber. Worthy of the journey."],
+    "DEFAULT":  ["{name} finds the entrance to the relic chamber."]
+  },
+  "cave_relic_guardian": {
+    "STOIC":    ["A guardian rises. {name} readies their weapon."],
+    "RECKLESS": ["A guardian appears — {name} grins and attacks!"],
+    "GRIM":     ["Of course there is a guardian. {name} has no patience left."],
+    "DEFAULT":  ["A guardian rises in the relic chamber!"]
+  },
+  "cave_relic_acquire": {
+    "STOIC":    ["{name} retrieves the relic."],
+    "CHEERFUL": ["{name} lifts the relic triumphantly!"],
+    "PROUD":    ["{name} claims the relic. History will note who found it."],
+    "DEFAULT":  ["{name} acquires the relic!"]
+  },
+  "cave_relic_empty": {
+    "CYNICAL":  ["The chamber is empty. Of course it is."],
+    "CHEERFUL": ["Nothing here. {name} tries not to be too disappointed."],
+    "DEFAULT":  ["The chamber is empty. The relic is not here."]
+  },
+
+  "bandit_march": {
+    "STOIC":    ["{name} marches toward the old mill."],
+    "RECKLESS": ["{name} rides hard for the bandit camp."],
+    "CAUTIOUS": ["{name} approaches the north road cautiously."],
+    "DEFAULT":  ["{name} heads toward the bandit camp."]
+  },
+  "bandit_road_ambush": {
+    "STOIC":    ["Bandits on the road. {name} deals with them."],
+    "RECKLESS": ["Ambush! {name} turns it into a brawl."],
+    "DEFAULT":  ["Bandits ambush {name} on the road!"]
+  },
+  "bandit_scout": {
+    "STOIC":    ["{name} scouts the camp perimeter."],
+    "CAUTIOUS": ["{name} takes position and watches the camp carefully."],
+    "RECKLESS": ["{name} gets close — too close, maybe."],
+    "DEFAULT":  ["{name} scouts the bandit camp."]
+  },
+  "bandit_weakness": {
+    "STOIC":    ["{name} spots a gap in the defences."],
+    "CHEERFUL": ["{name} notices a weak point — lucky!"],
+    "DEFAULT":  ["{name} discovers a weakness in the camp defences."]
+  },
+  "bandit_assault": {
+    "STOIC":    ["{name} begins the assault."],
+    "RECKLESS": ["{name} charges the camp!"],
+    "GRIM":     ["{name} moves in. No mercy."],
+    "DEFAULT":  ["{name} attacks the bandit camp."]
+  },
+  "bandit_main_fight": {
+    "STOIC":    ["The bandits fight back. {name} holds steady."],
+    "RECKLESS": ["Steel meets steel! {name} throws everything at them."],
+    "DEFAULT":  ["The camp erupts into battle!"]
+  },
+  "bandit_loot": {
+    "CHEERFUL": ["{name} finds coin stashed in the camp. (+{gold} gold)"],
+    "CYNICAL":  ["Ill-gotten gains, now liberated. {name} pockets the coin. (+{gold} gold)"],
+    "DEFAULT":  ["{name} finds gold among the camp supplies. (+{gold} gold)"]
+  },
+
+  "escort_depart": {
+    "STOIC":    ["{name} joins the merchant caravan and sets out."],
+    "CHEERFUL": ["{name} meets the merchant — pleasant company for the road!"],
+    "CYNICAL":  ["{name} joins the merchant. Babysitting duty, then."],
+    "DEFAULT":  ["{name} begins escorting the merchant toward Thornwall."]
+  },
+  "escort_day_one": {
+    "STOIC":    ["The first day on the road passes."],
+    "CAUTIOUS": ["{name} keeps watch through the first day's travel."],
+    "DEFAULT":  ["The road stretches ahead. Day one of the escort."]
+  },
+  "escort_wolves": {
+    "STOIC":    ["Wolves. {name} drives them off."],
+    "RECKLESS": ["Wolves! {name} charges them head-on."],
+    "DEFAULT":  ["A wolf pack attacks the caravan!"]
+  },
+  "escort_day_two": {
+    "STOIC":    ["Day two. The road grows rougher."],
+    "CAUTIOUS": ["{name} is extra vigilant. The dangerous stretch begins."],
+    "DEFAULT":  ["The second day of travel begins."]
+  },
+  "escort_bandits": {
+    "STOIC":    ["Bandits block the road. {name} steps forward."],
+    "RECKLESS": ["{name} spots the bandits and charges before they're ready!"],
+    "DEFAULT":  ["Bandits demand a toll from the caravan!"]
+  },
+  "escort_merchant_gift": {
+    "CHEERFUL": ["The grateful merchant slips {name} a few extra coins. (+{gold} gold)"],
+    "DEFAULT":  ["The merchant offers a bonus for the protection. (+{gold} gold)"]
+  },
+  "escort_arrival": {
+    "STOIC":    ["Thornwall in sight. The merchant is safe."],
+    "CHEERFUL": ["{name} delivers the merchant safely. Handshakes all round!"],
+    "PROUD":    ["{name} escorts the merchant through the gates of Thornwall. Job done, and done well."],
+    "DEFAULT":  ["The merchant arrives safely at Thornwall."]
+  },
+
+  "rumour_set_out": {
+    "STOIC":    ["{name} heads out to follow up the tip."],
+    "RECKLESS": ["{name} barely finishes reading the note before heading off."],
+    "CYNICAL":  ["{name} sighs and follows the lead anyway. Probably nothing."],
+    "CHEERFUL": ["{name} sets off to investigate — could be exciting!"],
+    "GRIM":     ["{name} goes to look into it. No great expectations."],
+    "CAUTIOUS": ["{name} reviews what little information there is before departing."],
+    "LOYAL":    ["{name} takes the job. Every lead is worth following for the guild."],
+    "PROUD":    ["{name} follows the rumour. A lead is a lead."],
+    "DEFAULT":  ["{name} sets out to investigate the rumour."]
+  },
+  "rumour_hear_more": {
+    "STOIC":    ["A local confirms there was something there — years ago."],
+    "CYNICAL":  ["Someone in a tavern swears they saw it once. Probably drunk."],
+    "CHEERFUL": ["{name} picks up another fragment of the story from a passer-by."],
+    "DEFAULT":  ["Another account, another contradiction. The rumour persists."]
+  },
+  "rumour_search": {
+    "STOIC":    ["{name} searches the mill district methodically."],
+    "RECKLESS": ["{name} tears the place apart looking for anything of note."],
+    "CYNICAL":  ["{name} pokes around. Dust and rubble. Typical."],
+    "CHEERFUL": ["{name} keeps at it, still hopeful something will turn up."],
+    "GRIM":     ["{name} searches in silence. The area offers little."],
+    "CAUTIOUS": ["{name} works carefully, checking every corner."],
+    "LOYAL":    ["{name} spends another day searching. The guild trusted this lead."],
+    "PROUD":    ["{name} refuses to give up. It has to be here somewhere."],
+    "DEFAULT":  ["{name} continues searching the area."]
+  },
+  "rumour_dead_end": {
+    "STOIC":    ["Nothing here. {name} marks it off the list."],
+    "RECKLESS": ["{name} kicks over another empty crate. Nothing."],
+    "CYNICAL":  ["As expected. Another dead end."],
+    "CHEERFUL": ["{name} tries to stay positive despite another blank result."],
+    "GRIM":     ["Empty. Just like the last place."],
+    "CAUTIOUS": ["{name} double-checks. Still nothing."],
+    "LOYAL":    ["Not here. {name} keeps looking."],
+    "PROUD":    ["There is nothing to find here. {name} refuses to admit defeat yet."],
+    "DEFAULT":  ["The trail goes cold. Nothing found."]
+  },
+  "rumour_find_it": {
+    "STOIC":    ["{name} found what they were looking for."],
+    "RECKLESS": ["{name} finally stumbles across it — tucked behind a false wall!"],
+    "CYNICAL":  ["Well. It was actually there."],
+    "CHEERFUL": ["{name} found it! Couldn't believe their luck!"],
+    "GRIM":     ["There it is. {name} takes it and leaves."],
+    "CAUTIOUS": ["{name} locates the item after a thorough search."],
+    "LOYAL":    ["Success. {name} retrieves what they came for."],
+    "PROUD":    ["{name} found it. Of course they did."],
+    "DEFAULT":  ["{name} finds what the rumour pointed to."]
   }
 }

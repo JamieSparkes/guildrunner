@@ -4,7 +4,8 @@
       "Bash(find /c/Users/PureT/Desktop/Guildrunner/data -type f -name *.json)",
       "Bash(ls -la /c/Users/PureT/Desktop/Guildrunner/autoloads/*.gd)",
       "Read(//c/Users/PureT/Desktop/Guildrunner/**)",
-      "Bash(grep -n \"feed_intervention_available\\\\|_resolve_mission\\\\|_emit_mission_narrative\\\\|_populate_feed\\\\|_collect_pending\\\\|setup.*mission_id.*context\\\\|get_active_missions\" tests/*.gd)"
+      "Bash(grep -n \"feed_intervention_available\\\\|_resolve_mission\\\\|_emit_mission_narrative\\\\|_populate_feed\\\\|_collect_pending\\\\|setup.*mission_id.*context\\\\|get_active_missions\" tests/*.gd)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

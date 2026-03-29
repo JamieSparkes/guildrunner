@@ -22,6 +22,10 @@ const REQUIRED_EVENT_KEYS: Array[String] = [
 	"hero_died",
 	"hero_captured",
 	"hero_returned",
+	"stage_advance_fail",
+	"stage_combat_victory",
+	"stage_combat_struggle",
+	"stage_timed_out",
 ]
 
 ## Event keys that can trigger an intervention prompt (if tokens are available).
@@ -59,6 +63,10 @@ const RESERVED_EVENT_COLORS: Dictionary = {
 	"outcome_full_success": Color(0.20, 0.80, 0.20),   # Green
 	"outcome_success":     Color(0.20, 0.80, 0.20),    # Green
 }
+
+## When true, every push_event() call prints a rich debug block to the Godot console.
+## Toggle with F10 at runtime.
+var debug_feed: bool = false
 
 ## Active feed entries per mission. { mission_id: Array } — each array holds FeedEvent.
 var active_feeds: Dictionary = {}
@@ -108,6 +116,8 @@ func push_event(mission_id: String, event_key: String, params: Dictionary) -> vo
 	if _streaming_active:
 		_stream_queue.append(event)
 		EventBus.feed_stream_event_queued.emit()
+	if debug_feed:
+		_debug_print_event(mission_id, event_key, params, text, event_color)
 
 ## All events for a mission, oldest first. Returns [] if mission not known.
 func get_feed(mission_id: String) -> Array:
@@ -236,6 +246,97 @@ func _substitute(template: String, params: Dictionary) -> String:
 
 func _on_feed_event(mission_id: String, event_key: String, params: Dictionary) -> void:
 	push_event(mission_id, event_key, params)
+
+# ── Debug ─────────────────────────────────────────────────────────────────────
+
+func _debug_print_event(
+	mission_id: String,
+	event_key: String,
+	params: Dictionary,
+	formatted_text: String,
+	event_color: Color
+) -> void:
+	var lines: Array[String] = []
+	lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	lines.append("[FEED] Day %d  |  %s  |  %s" % [TimeManager.current_day, mission_id, event_key])
+	lines.append("  Text     : %s" % formatted_text)
+
+	# Params
+	if not params.is_empty():
+		var param_parts: Array[String] = []
+		for k: String in params.keys():
+			param_parts.append("%s=%s" % [k, str(params[k])])
+		lines.append("  Params   : { %s }" % ", ".join(param_parts))
+
+	# Color + flags
+	var color_hex := event_color.to_html(false)
+	var can_intervene := event_key in INTERVENTION_TRIGGER_KEYS
+	lines.append("  Color    : #%s  |  can_intervene=%s  |  streaming=%s" % [
+		color_hex, str(can_intervene), str(_streaming_active)
+	])
+
+	# Mission progress from MissionManager
+	var progress: Variant = MissionManager.get_mission_progress(mission_id)
+	if progress != null:
+		var stage_idx: int = progress["current_stage_index"]
+		var total: int = progress["total_stages"]
+		var stage_names: Array = progress["stage_names"]
+		var cur_name: String = stage_names[stage_idx] if stage_idx < stage_names.size() else "—"
+		lines.append("  Stage    : %d/%d  current=%s  completed=%s" % [
+			stage_idx, total, cur_name, str(progress["completed"])
+		])
+		# Flags
+		var flags: Dictionary = {}
+		for mission in MissionManager.get_active_missions():
+			if mission.mission_id == mission_id:
+				flags = mission.flags
+				break
+		if not flags.is_empty():
+			var flag_parts: Array[String] = []
+			for fk: String in flags.keys():
+				flag_parts.append("%s=%s" % [fk, str(flags[fk])])
+			lines.append("  Flags    : { %s }" % ", ".join(flag_parts))
+		else:
+			lines.append("  Flags    : (none)")
+		# Heroes
+		var hero_ids: Array = progress["hero_ids"]
+		for hid: String in hero_ids:
+			var hero: HeroData = HeroManager.get_hero(hid)
+			if hero == null:
+				lines.append("  Hero     : %s (not found)" % hid)
+				continue
+			var status_name: String = Enums.HeroStatus.keys()[hero.status]
+			var injury_str := ""
+			if hero.status in [Enums.HeroStatus.INJURED, Enums.HeroStatus.RECOVERING]:
+				injury_str = "  recovery_days=%d" % hero.injury_recovery_days
+			lines.append("  Hero     : %s [%s]  str=%.0f  agi=%.0f  ste=%.0f  res=%.0f  lea=%.0f  morale=%.0f%s" % [
+				hero.display_name, status_name,
+				hero.strength, hero.agility, hero.stealth,
+				hero.resilience, hero.leadership, hero.morale,
+				injury_str
+			])
+		# Accumulated combat outcomes
+		var combat_outcomes: Dictionary = progress["combat_outcomes"]
+		if not combat_outcomes.is_empty():
+			for hid: String in combat_outcomes.keys():
+				var oc: Dictionary = combat_outcomes[hid]
+				lines.append("  Outcome  : %s — injured=%s sev=%s died=%s captured=%s recovery=%d" % [
+					hid,
+					str(oc.get("injured", false)),
+					Enums.InjurySeverity.keys()[oc.get("severity", 0)],
+					str(oc.get("died", false)),
+					str(oc.get("captured", false)),
+					oc.get("recovery_days", 0),
+				])
+	else:
+		lines.append("  Mission  : not found in MissionManager (may be finalized)")
+
+	# Stream queue depth
+	lines.append("  Queue    : %d events pending  |  buffer=%d" % [
+		_stream_queue.size(), _day_buffer.size()
+	])
+
+	print("\n".join(lines))
 
 # ── Test helpers ──────────────────────────────────────────────────────────────
 

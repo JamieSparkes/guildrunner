@@ -67,10 +67,8 @@ func _build_ui() -> void:
 	identity.add_theme_constant_override("separation", 16)
 	vbox.add_child(identity)
 
-	# Portrait placeholder
-	var portrait := ColorRect.new()
-	portrait.custom_minimum_size = Vector2(96, 96)
-	portrait.color = Color(0.25, 0.20, 0.15)
+	# Portrait
+	var portrait := PortraitHelper.create_portrait_rect(_hero.portrait_id, 96.0)
 	identity.add_child(portrait)
 
 	var id_info := VBoxContainer.new()

@@ -76,6 +76,8 @@ func _generate_contract(day: int) -> ContractData:
 	var chosen_id: String = eligible[randi() % eligible.size()]
 	var tpl: ContractData = _templates[chosen_id]
 	var contract: ContractData = tpl.duplicate()
+	# Resource.duplicate() only copies @export vars; copy non-exported fields.
+	contract.stages = tpl.stages
 	_counter += 1
 	contract.contract_id = "contract_%d_%s" % [_counter, chosen_id]
 	contract.expiry_day = day + randi_range(2, 3)

@@ -68,6 +68,13 @@ signal intervention_command_result(success: bool, error: String)
 
 # ── Feed streaming ─────────────────────────────────────────────────────────────
 
+## Emitted by MissionManager when a staged mission advances to a new stage.
+## stage_index is the stage the heroes have just entered (0-based).
+signal mission_stage_advanced(mission_id: String, stage_index: int, total_stages: int)
+
+## Emitted by MissionManager when a staged mission completes (all stages or timeout).
+signal mission_stage_completed(mission_id: String, success: bool)
+
 ## Emitted by MissionManager when pre-outcome events have been queued for a mission.
 ## FeedScreen appends mission_id to its finalization queue.
 signal mission_narrative_started(mission_id: String)
